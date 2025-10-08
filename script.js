@@ -1,68 +1,74 @@
 // script.js
 
-// script.js (APENAS A FUNÇÃO ENVIAR MENSAGEM FOI REVISADA E CORRIGIDA)
-
 // Variável de controle para o estado de digitação
 let isTyping = false;
 
-// Função para enviar a mensagem (chamada por Enter ou pelo botão)
+// --- Funções de Envio e Controle ---
+
 function enviarMensagem() {
-    if (isTyping) return; // Não envia se a IA estiver digitando
+    // 1. Bloqueia se a IA já estiver respondendo
+    if (isTyping) return; 
 
     const perguntaInput = document.getElementById('perguntaInput');
+    const sendButton = document.getElementById('sendButton');
     const pergunta = perguntaInput.value.trim();
 
     if (pergunta !== '') {
-        // Desativa o input e o botão para evitar múltiplos envios
+        
+        // 2. Define o estado de digitação e desativa inputs
+        isTyping = true;
         perguntaInput.disabled = true;
-        document.getElementById('sendButton').disabled = true;
+        sendButton.disabled = true;
         
         const resposta = obterResposta(pergunta);
         
-        // 1. Adicionar e exibir a mensagem do usuário (com digitação)
+        // 3. Adicionar e exibir a mensagem do usuário (com digitação)
         adicionarMensagemComDigitacao("Você", pergunta, 'user-message', () => {
-            // Este é o CALLBACK executado APÓS a mensagem do usuário terminar de digitar.
+            // CALLBACK executado APÓS a mensagem do usuário terminar de digitar.
             
-            // Limpa o conteúdo do campo de entrada (agora que o envio foi validado)
+            // Limpa o campo de entrada
             perguntaInput.value = '';
 
-            // 2. Ligar o indicador e definir o estado de digitação
+            // 4. Ligar o indicador
             mostrarIndicadorDigitacao(true);
-            isTyping = true;
 
-            // 3. Simular um atraso para a IA "pensar" (1 segundo)
+            // 5. Simular um atraso para a IA "pensar" (1 segundo)
             setTimeout(() => {
                 
-                // 4. Adicionar e exibir a resposta do PM GPT (com digitação)
+                // 6. Adicionar e exibir a resposta do PM GPT
                 adicionarMensagemComDigitacao("Product Manager GPT", resposta, 'pmgpt-message', () => {
-                    // Este é o CALLBACK executado APÓS a mensagem da IA terminar de digitar.
+                    // CALLBACK executado APÓS a mensagem da IA terminar de digitar.
                     
-                    // 5. Ocultar o indicador e reativar o input
+                    // 7. Ocultar o indicador
                     mostrarIndicadorDigitacao(false);
+                    
+                    // 8. Reativar o input, botão e zerar o estado
                     perguntaInput.disabled = false;
-                    document.getElementById('sendButton').disabled = false;
-                    isTyping = false;
+                    sendButton.disabled = false;
+                    isTyping = false; 
                     perguntaInput.focus(); // Coloca o foco de volta
                     
-                    // 6. Salvar o novo estado da conversa
+                    // 9. Salvar o novo estado da conversa
                     salvarHistorico();
                 });
             }, 1000); 
         });
-
-        // O input.value = ''; foi movido para DENTRO do callback do usuário para garantir a ordem correta
+    } else {
+        // Se a pergunta estiver vazia, garante que o input esteja ativo e isTyping seja false.
+        perguntaInput.disabled = false;
+        sendButton.disabled = false;
+        isTyping = false;
     }
 }
 
 function verificarTecla(event) {
     if (event.key === "Enter") {
         event.preventDefault();
-        enviarMensagem(); // Chama a função unificada
+        enviarMensagem(); // Chama a função unificada de envio
     }
 }
 
-// ... As outras funções (obterResposta, adicionarMensagemComDigitacao, etc.) seguem inalteradas
-
+// --- Funções Auxiliares (Resposta e Digitação) ---
 
 function obterResposta(pergunta) {
     const respostas = [
@@ -111,11 +117,13 @@ function adicionarMensagemComDigitacao(remetente, resposta, classe, callback = (
     const contentElement = document.createElement('div');
     contentElement.className = 'message-content';
     
-    // Adiciona o ícone e o conteúdo
-    mensagemElement.appendChild(remetente === "Você" ? contentElement : avatar);
+    
+    // Adiciona o ícone e o conteúdo na ordem correta
     if (remetente === "Você") {
+        mensagemElement.appendChild(contentElement);
         mensagemElement.appendChild(avatar);
     } else {
+        mensagemElement.appendChild(avatar);
         mensagemElement.appendChild(contentElement);
     }
     
@@ -123,15 +131,13 @@ function adicionarMensagemComDigitacao(remetente, resposta, classe, callback = (
 
     let index = 0;
     
-    // Armazena a mensagem completa
     const textoCompleto = resposta;
 
     function exibirProximoCaractere() {
         if (index < textoCompleto.length) {
-            // Adiciona o texto com a formatação (negrito, etc.)
             contentElement.innerHTML = textoCompleto.substring(0, index + 1);
             index++;
-            // Ajusta a velocidade de digitação para a IA ser um pouco mais lenta
+            // Velocidade de digitação
             const delay = remetente === "Product Manager GPT" ? 35 : 15; 
             setTimeout(exibirProximoCaractere, delay);
         } else {
@@ -144,7 +150,7 @@ function adicionarMensagemComDigitacao(remetente, resposta, classe, callback = (
             mensagemElement.appendChild(timestamp);
 
             chatMessages.scrollTop = chatMessages.scrollHeight;
-            callback(); // Chama o callback
+            callback(); // Chama o callback para seguir o fluxo (ex: responder a IA)
         }
     }
 
@@ -152,7 +158,16 @@ function adicionarMensagemComDigitacao(remetente, resposta, classe, callback = (
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
-// --- Feature: Histórico de Sessão (LocalStorage) ---
+function mostrarIndicadorDigitacao(show) {
+    const indicator = document.getElementById('typingIndicator');
+    indicator.style.display = show ? 'flex' : 'none';
+    const chatMessages = document.getElementById('chatMessages');
+    // Rola para o fim para mostrar o indicador
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+
+// --- Funções de Histórico e Inicialização ---
 
 function salvarHistorico() {
     const messages = [];
@@ -162,7 +177,8 @@ function salvarHistorico() {
     Array.from(chatMessagesDiv.children).forEach(msgElement => {
         if (msgElement.classList.contains('chat-message')) {
             const remetente = msgElement.querySelector('.avatar-icon').classList.contains('fa-user-circle') ? "Você" : "Product Manager GPT";
-            const texto = msgElement.querySelector('.message-content').innerHTML;
+            // Usa innerHTML para manter a formatação (negrito)
+            const texto = msgElement.querySelector('.message-content').innerHTML; 
             const classe = msgElement.classList.contains('user-message') ? 'user-message' : 'pmgpt-message';
             const timestamp = msgElement.querySelector('.timestamp').textContent;
 
@@ -189,13 +205,14 @@ function carregarHistorico() {
             // Conteúdo
             const contentElement = document.createElement('div');
             contentElement.className = 'message-content';
-            contentElement.innerHTML = msg.texto; // Usa innerHTML para manter a formatação (negrito)
+            contentElement.innerHTML = msg.texto; 
 
             // Carimbo de data/hora
             const timestamp = document.createElement('span');
             timestamp.className = 'timestamp';
             timestamp.textContent = msg.timestamp;
             
+            // Reconstroi a ordem correta
             if (msg.remetente === "Você") {
                 mensagemElement.appendChild(contentElement);
                 mensagemElement.appendChild(avatar);
@@ -211,27 +228,12 @@ function carregarHistorico() {
         chatMessages.scrollTop = chatMessages.scrollHeight;
     } else {
         // Mensagem de boas-vindas na primeira sessão
-        adicionarMensagemComDigitacao("Product Manager GPT", "Bem-vindo, stakeholder! Pronto para ter suas perguntas respondidas com clareza e zero clichês? (Resposta: **Depende**).", 'pmgpt-message');
+        // Usamos setTimeout para garantir que a DOM esteja carregada antes de iniciar o efeito de digitação.
+        setTimeout(() => {
+            adicionarMensagemComDigitacao("Product Manager GPT", "Bem-vindo, stakeholder! Pronto para ter suas perguntas respondidas com clareza e zero clichês? (Resposta: **Depende**).", 'pmgpt-message');
+        }, 100);
     }
 }
-
-// --- Inicialização ---
-
-document.addEventListener('DOMContentLoaded', () => {
-    carregarHistorico();
-    
-    // Adiciona listener para o botão de enviar
-    document.getElementById('sendButton').onclick = enviarMensagem;
-    
-    // Adiciona listener para o modo noturno
-    const body = document.body;
-    const toggleButton = document.getElementById('toggleNightMode');
-    // Verifica se o modo noturno estava ativo
-    if (localStorage.getItem('darkMode') === 'enabled') {
-        body.classList.add('dark-mode');
-    }
-    toggleButton.onclick = alternarModoNoturno;
-});
 
 
 function alternarModoNoturno() {
@@ -246,9 +248,21 @@ function alternarModoNoturno() {
 }
 
 
-// --- Indicador de Digitação ---
-
-function mostrarIndicadorDigitacao(show) {
-    const indicator = document.getElementById('typingIndicator');
-    indicator.style.display = show ? 'flex' : 'none';
-}
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Carrega o histórico (se existir)
+    carregarHistorico();
+    
+    // 2. Inicializa o Modo Noturno
+    const body = document.body;
+    const toggleButton = document.getElementById('toggleNightMode');
+    if (localStorage.getItem('darkMode') === 'enabled') {
+        body.classList.add('dark-mode');
+    }
+    toggleButton.onclick = alternarModoNoturno;
+    
+    // 3. Adiciona listener para o botão de enviar (já é feito no onclick do HTML)
+    // document.getElementById('sendButton').onclick = enviarMensagem;
+    
+    // Coloca o foco no input
+    document.getElementById('perguntaInput').focus();
+});
