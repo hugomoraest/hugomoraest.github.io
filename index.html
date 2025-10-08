@@ -3,19 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
-    <title>Fun Manager GPT</title>
+    <title>Product Manager GPT</title>
 </head>
 <body>
     <div class="chat-container">
         <div class="chat-header">
-            <h1>Fun Manager GPT</h1>
+            <h1><i class="fas fa-robot"></i> Product Manager GPT</h1>
             <div class="subtitle">Para stakeholders</div>
             <button id="toggleNightMode" onclick="alternarModoNoturno()">Modo Noturno</button>
         </div>
         <div id="chatMessages" class="chat-messages"></div>
+        <div id="typingIndicator" class="typing-indicator" style="display: none;">
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+        </div>
         <div class="chat-input">
             <input id="perguntaInput" type="text" placeholder="Faça sua pergunta" onkeydown="verificarTecla(event)">
+            <button id="sendButton" onclick="enviarMensagem()"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
     <script src="script.js"></script>
