@@ -7,12 +7,12 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background-color: #fff;
+    background-color: #f7f7f7; /* Cor de fundo mais suave */
     transition: background-color 0.3s ease;
 }
 
 body.dark-mode {
-    background-color: #333;
+    background-color: #2c2c2c;
     color: #fff;
 }
 
@@ -20,94 +20,210 @@ body.dark-mode {
     width: 100%;
     max-width: 400px;
     border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Sombra mais destacada */
     display: flex;
     flex-direction: column;
     max-height: 90vh;
     background-color: #fff;
     transition: background-color 0.3s ease;
+    /* Animação de entrada */
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .dark-mode .chat-container {
     background-color: #333;
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .chat-header {
-    
-    justify-content: space-between;
-    align-items: center;
+    display: flex; /* Usado para melhor alinhamento */
+    flex-direction: column;
     background-color: #0077cc;
     color: #fff;
-    padding: 10px;
+    padding: 15px;
     text-align: left;
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
+    position: relative; /* Para posicionar o botão */
 }
 
 .chat-header h1 {
     margin: 0;
+    font-size: 20px;
 }
 
 .subtitle {
     font-size: 14px;
     margin-top: 5px;
-    margin-left: 10px; /* Adicionado margin-left para espaçamento entre h1 e subtitle */
-}
-
-/* Adicionado para ajustar o posicionamento do toggle */
-#toggleNightMode, .subtitle {
-    margin-right: 10px;
+    /* Remover margin-left desnecessário */
 }
 
 #toggleNightMode {
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    padding: 8px 12px;
-    background-color: #0077cc;
+    position: absolute; /* Posicionamento fixo no cabeçalho */
+    top: 15px;
+    right: 15px;
+    padding: 6px 10px;
+    background-color: rgba(255, 255, 255, 0.2);
     color: #fff;
-    border: none;
+    border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 5px;
     cursor: pointer;
+    font-size: 12px;
+    transition: background-color 0.3s;
 }
 
-.dark-mode #toggleNightMode {
-    background-color: #333;
+#toggleNightMode:hover {
+    background-color: rgba(255, 255, 255, 0.3);
 }
 
 .chat-messages {
     flex: 1;
-    padding: 30px;
+    padding: 20px 15px;
     overflow-y: auto;
 }
 
 .chat-input {
+    display: flex;
     padding: 10px;
     border-top: 1px solid #ddd;
+    background-color: #fff;
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
 }
 
+.dark-mode .chat-input {
+    background-color: #333;
+    border-top: 1px solid #444;
+}
+
 #perguntaInput {
-    width: calc(100% - 20px);
+    flex-grow: 1;
     height: 40px;
-    padding: 10px;
+    padding: 0 10px;
     font-size: 16px;
-    border: none;
+    border: 1px solid #ccc;
     outline: none;
-    border-radius: 8px;
+    border-radius: 20px;
+    margin-right: 8px;
+    transition: border-color 0.3s;
+}
+
+.dark-mode #perguntaInput {
+    background-color: #444;
+    color: #fff;
+    border-color: #555;
 }
 
 #perguntaInput:focus {
-    border-bottom: 1px solid #0077cc;
-    border-radius: 8px;
+    border-color: #0077cc;
 }
 
+#sendButton {
+    width: 40px;
+    height: 40px;
+    background-color: #0077cc;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+#sendButton:hover {
+    background-color: #005aa3;
+}
+
+/* --- Estilo de Mensagens (Bolhas) --- */
 .chat-message {
-    margin-bottom: 10px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: flex-end; /* Alinha o carimbo com a bolha */
 }
 
-.chat-message strong {
+.message-content {
+    padding: 8px 12px;
+    border-radius: 15px;
+    max-width: 85%;
+    position: relative;
+    font-size: 14px;
+}
+
+.user-message .message-content {
+    background-color: #dcf8c6; /* Verde claro */
+    margin-left: auto; /* Alinha à direita */
+    border-bottom-right-radius: 5px;
+}
+
+.pmgpt-message .message-content {
+    background-color: #f1f0f0; /* Cinza claro */
+    margin-right: auto; /* Alinha à esquerda */
+    border-bottom-left-radius: 5px;
+}
+
+.dark-mode .pmgpt-message .message-content {
+    background-color: #444;
+}
+
+
+/* Estilo para o carimbo de data/hora */
+.timestamp {
+    font-size: 10px;
+    color: #999;
+    margin: 0 5px;
+    align-self: flex-end; /* Alinha ao fim do container flex */
+}
+
+/* Estilo para o ícone de avatar */
+.avatar-icon {
+    font-size: 18px;
+    margin-right: 5px;
+    align-self: flex-start;
+}
+
+.pmgpt-message .avatar-icon {
     color: #0077cc;
+}
+
+.user-message .avatar-icon {
+    color: #4CAF50;
+    order: 2; /* Move o ícone do usuário para a direita da bolha */
+    margin-left: 5px;
+    margin-right: 0;
+}
+
+.user-message .message-content {
+    order: 1; /* Move o conteúdo para a esquerda do ícone do usuário */
+}
+
+/* --- Indicador de Digitação (Typing Indicator) --- */
+.typing-indicator {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    font-size: 14px;
+    color: #888;
+}
+
+.typing-dot {
+    width: 6px;
+    height: 6px;
+    background-color: #888;
+    border-radius: 50%;
+    margin: 0 2px;
+    animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.typing-dot:nth-child(1) { animation-delay: -0.32s; }
+.typing-dot:nth-child(2) { animation-delay: -0.16s; }
+.typing-dot:nth-child(3) { animation-delay: 0s; }
+
+@keyframes bounce {
+  0%, 80%, 100% { transform: scale(0); }
+  40% { transform: scale(1.0); }
 }
