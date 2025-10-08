@@ -139,6 +139,11 @@ body.dark-mode {
     background-color: #005aa3;
 }
 
+#sendButton:disabled {
+    background-color: #999;
+    cursor: not-allowed;
+}
+
 /* --- Estilo de Mensagens (Bolhas) --- */
 .chat-message {
     margin-bottom: 12px;
@@ -152,6 +157,7 @@ body.dark-mode {
     max-width: 85%;
     position: relative;
     font-size: 14px;
+    word-wrap: break-word; /* Para garantir que o texto quebre corretamente */
 }
 
 .user-message .message-content {
@@ -208,6 +214,8 @@ body.dark-mode {
     padding: 10px 15px;
     font-size: 14px;
     color: #888;
+    /* Alinhamento ao canto inferior esquerdo */
+    justify-content: flex-start; 
 }
 
 .typing-dot {
