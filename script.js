@@ -1,29 +1,64 @@
 // script.js
 
-function alternarModoNoturno() {
-    const body = document.body;
-    body.classList.toggle('dark-mode');
+// Variável de controle para o estado de digitação
+let isTyping = false;
+
+// Função para enviar a mensagem (chamada por Enter ou pelo botão)
+function enviarMensagem() {
+    if (isTyping) return; // Não envia se a IA estiver digitando
+
+    const perguntaInput = document.getElementById('perguntaInput');
+    const pergunta = perguntaInput.value.trim();
+
+    if (pergunta !== '') {
+        // Desativa o input para evitar múltiplos envios
+        perguntaInput.disabled = true;
+        document.getElementById('sendButton').disabled = true;
+        
+        const resposta = obterResposta(pergunta);
+        
+        adicionarMensagemComDigitacao("Você", pergunta, 'user-message', () => {
+            // Callback após a mensagem do usuário ser exibida
+            
+            // Exibir o indicador de digitação
+            mostrarIndicadorDigitacao(true);
+            isTyping = true;
+
+            // Simular um atraso para a IA responder
+            setTimeout(() => {
+                adicionarMensagemComDigitacao("Product Manager GPT", resposta, 'pmgpt-message', () => {
+                    // Callback após a mensagem da IA ser exibida
+                    
+                    // Ocultar o indicador e reativar o input
+                    mostrarIndicadorDigitacao(false);
+                    perguntaInput.disabled = false;
+                    document.getElementById('sendButton').disabled = false;
+                    isTyping = false;
+                    perguntaInput.focus(); // Coloca o foco de volta
+                    
+                    // Salvar o novo estado da conversa
+                    salvarHistorico();
+                });
+            }, 1000); // Atraso de 1 segundo
+        });
+
+        // Limpar o conteúdo do campo de entrada
+        perguntaInput.value = '';
+    }
 }
+
 
 function verificarTecla(event) {
     if (event.key === "Enter") {
         event.preventDefault();
-        const perguntaInput = document.getElementById('perguntaInput');
-        const pergunta = perguntaInput.value.trim();
-
-        if (pergunta !== '') {
-            const resposta = obterRespostaAleatoria();
-            adicionarMensagemComDigitacao("Você", pergunta);
-            adicionarMensagemComDigitacao("Product Manager GPT", resposta);
-
-             // Limpar o conteúdo do campo de entrada após pressionar Enter
-        perguntaInput.value = '';
-        }
+        enviarMensagem(); // Chama a função unificada
     }
 }
-function obterRespostaAleatoria() {
+
+
+function obterResposta(pergunta) {
     const respostas = [
-       "Ah, a resposta mais confiável desde que Sócrates era um PM. Depende... talvez eu tenha uma resposta melhor depois de consultar a minha bola de cristal.",
+        "Ah, a resposta mais confiável desde que Sócrates era um PM. **Depende...** talvez eu tenha uma resposta melhor depois de consultar a minha bola de cristal.",
         "Estamos adicionando isso à nossa lista de tarefas, junto com encontrar a fonte da eterna juventude para nossos desenvolvedores.",
         "Vamos colocar nossos matemáticos para trabalhar e ver se vale a pena mais do que uma máquina de café infinita.",
         "Vamos fazer uma festa com os usuários para celebrar suas opiniões enquanto oferecemos pizza grátis. Pesquisa de mercado com estilo!",
@@ -41,26 +76,171 @@ function obterRespostaAleatoria() {
         "Nossos objetivos são tão claros que até os astrólogos concordam. O universo está alinhado, e nosso produto também."
     ];
 
- const indiceResposta = Math.floor(Math.random() * respostas.length);
+    // --- Feature: Respostas Específicas por Palavra-Chave (Easter Egg) ---
+    const perguntaLower = pergunta.toLowerCase();
+    if (perguntaLower.includes('roadmap')) {
+        return "O roadmap? Está no mesmo lugar que o dinheiro que a gente economizou cortando o café. Ou seja, 'em desenvolvimento', mas ninguém sabe onde.";
+    }
+    if (perguntaLower.includes('prioridade')) {
+        return "Tudo é prioridade! A prioridade da prioridade é o que a gente resolve agora, ou talvez depois do almoço. Deixe-me ver o Excel de 'urgência vs importância' de novo...";
+    }
+
+    const indiceResposta = Math.floor(Math.random() * respostas.length);
     return respostas[indiceResposta];
 }
 
-function adicionarMensagemComDigitacao(remetente, resposta) {
+
+function adicionarMensagemComDigitacao(remetente, resposta, classe, callback = () => {}) {
     const chatMessages = document.getElementById('chatMessages');
     const mensagemElement = document.createElement('div');
-    mensagemElement.className = 'chat-message';
+    mensagemElement.className = `chat-message ${classe}`;
+    
+    // Icone
+    const iconClass = remetente === "Você" ? "fas fa-user-circle" : "fas fa-robot";
+    const avatar = `<i class="${iconClass} avatar-icon"></i>`;
+    
+    // Elemento do conteúdo da bolha
+    const contentElement = document.createElement('div');
+    contentElement.className = 'message-content';
+    
+    // Adiciona o ícone e o conteúdo
+    mensagemElement.appendChild(remetente === "Você" ? contentElement : avatar);
+    if (remetente === "Você") {
+        mensagemElement.appendChild(avatar);
+    } else {
+        mensagemElement.appendChild(contentElement);
+    }
+    
     chatMessages.appendChild(mensagemElement);
 
     let index = 0;
+    
+    // Armazena a mensagem completa
+    const textoCompleto = resposta;
 
     function exibirProximoCaractere() {
-        if (index < resposta.length) {
-            mensagemElement.innerHTML = `<strong>${remetente}:</strong> ${resposta.substring(0, index + 1)}`;
+        if (index < textoCompleto.length) {
+            // Adiciona o texto com a formatação (negrito, etc.)
+            contentElement.innerHTML = textoCompleto.substring(0, index + 1);
             index++;
-            setTimeout(exibirProximoCaractere, 30);
+            // Ajusta a velocidade de digitação para a IA ser um pouco mais lenta
+            const delay = remetente === "Product Manager GPT" ? 35 : 15; 
+            setTimeout(exibirProximoCaractere, delay);
+        } else {
+            // Fim da digitação
+            
+            // Adiciona o carimbo de data/hora
+            const timestamp = document.createElement('span');
+            timestamp.className = 'timestamp';
+            timestamp.textContent = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            mensagemElement.appendChild(timestamp);
+
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            callback(); // Chama o callback
         }
     }
 
     exibirProximoCaractere();
     chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+// --- Feature: Histórico de Sessão (LocalStorage) ---
+
+function salvarHistorico() {
+    const messages = [];
+    const chatMessagesDiv = document.getElementById('chatMessages');
+    
+    // Percorre todos os elementos de mensagem (ignorando o indicador de digitação)
+    Array.from(chatMessagesDiv.children).forEach(msgElement => {
+        if (msgElement.classList.contains('chat-message')) {
+            const remetente = msgElement.querySelector('.avatar-icon').classList.contains('fa-user-circle') ? "Você" : "Product Manager GPT";
+            const texto = msgElement.querySelector('.message-content').innerHTML;
+            const classe = msgElement.classList.contains('user-message') ? 'user-message' : 'pmgpt-message';
+            const timestamp = msgElement.querySelector('.timestamp').textContent;
+
+            messages.push({ remetente, texto, classe, timestamp });
+        }
+    });
+    localStorage.setItem('chatHistory', JSON.stringify(messages));
+}
+
+function carregarHistorico() {
+    const history = localStorage.getItem('chatHistory');
+    if (history) {
+        const messages = JSON.parse(history);
+        const chatMessages = document.getElementById('chatMessages');
+        
+        messages.forEach(msg => {
+            const mensagemElement = document.createElement('div');
+            mensagemElement.className = `chat-message ${msg.classe}`;
+            
+            // Icone
+            const iconClass = msg.remetente === "Você" ? "fas fa-user-circle" : "fas fa-robot";
+            const avatar = `<i class="${iconClass} avatar-icon"></i>`;
+            
+            // Conteúdo
+            const contentElement = document.createElement('div');
+            contentElement.className = 'message-content';
+            contentElement.innerHTML = msg.texto; // Usa innerHTML para manter a formatação (negrito)
+
+            // Carimbo de data/hora
+            const timestamp = document.createElement('span');
+            timestamp.className = 'timestamp';
+            timestamp.textContent = msg.timestamp;
+            
+            if (msg.remetente === "Você") {
+                mensagemElement.appendChild(contentElement);
+                mensagemElement.appendChild(avatar);
+            } else {
+                mensagemElement.appendChild(avatar);
+                mensagemElement.appendChild(contentElement);
+            }
+            mensagemElement.appendChild(timestamp);
+            
+            chatMessages.appendChild(mensagemElement);
+        });
+        
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    } else {
+        // Mensagem de boas-vindas na primeira sessão
+        adicionarMensagemComDigitacao("Product Manager GPT", "Bem-vindo, stakeholder! Pronto para ter suas perguntas respondidas com clareza e zero clichês? (Resposta: **Depende**).", 'pmgpt-message');
+    }
+}
+
+// --- Inicialização ---
+
+document.addEventListener('DOMContentLoaded', () => {
+    carregarHistorico();
+    
+    // Adiciona listener para o botão de enviar
+    document.getElementById('sendButton').onclick = enviarMensagem;
+    
+    // Adiciona listener para o modo noturno
+    const body = document.body;
+    const toggleButton = document.getElementById('toggleNightMode');
+    // Verifica se o modo noturno estava ativo
+    if (localStorage.getItem('darkMode') === 'enabled') {
+        body.classList.add('dark-mode');
+    }
+    toggleButton.onclick = alternarModoNoturno;
+});
+
+
+function alternarModoNoturno() {
+    const body = document.body;
+    body.classList.toggle('dark-mode');
+    // Salva a preferência
+    if (body.classList.contains('dark-mode')) {
+        localStorage.setItem('darkMode', 'enabled');
+    } else {
+        localStorage.setItem('darkMode', 'disabled');
+    }
+}
+
+
+// --- Indicador de Digitação ---
+
+function mostrarIndicadorDigitacao(show) {
+    const indicator = document.getElementById('typingIndicator');
+    indicator.style.display = show ? 'flex' : 'none';
 }
