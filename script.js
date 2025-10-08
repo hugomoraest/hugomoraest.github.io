@@ -1,5 +1,7 @@
 // script.js
 
+// script.js (APENAS A FUNÇÃO ENVIAR MENSAGEM FOI REVISADA E CORRIGIDA)
+
 // Variável de controle para o estado de digitação
 let isTyping = false;
 
@@ -11,42 +13,46 @@ function enviarMensagem() {
     const pergunta = perguntaInput.value.trim();
 
     if (pergunta !== '') {
-        // Desativa o input para evitar múltiplos envios
+        // Desativa o input e o botão para evitar múltiplos envios
         perguntaInput.disabled = true;
         document.getElementById('sendButton').disabled = true;
         
         const resposta = obterResposta(pergunta);
         
+        // 1. Adicionar e exibir a mensagem do usuário (com digitação)
         adicionarMensagemComDigitacao("Você", pergunta, 'user-message', () => {
-            // Callback após a mensagem do usuário ser exibida
+            // Este é o CALLBACK executado APÓS a mensagem do usuário terminar de digitar.
             
-            // Exibir o indicador de digitação
+            // Limpa o conteúdo do campo de entrada (agora que o envio foi validado)
+            perguntaInput.value = '';
+
+            // 2. Ligar o indicador e definir o estado de digitação
             mostrarIndicadorDigitacao(true);
             isTyping = true;
 
-            // Simular um atraso para a IA responder
+            // 3. Simular um atraso para a IA "pensar" (1 segundo)
             setTimeout(() => {
+                
+                // 4. Adicionar e exibir a resposta do PM GPT (com digitação)
                 adicionarMensagemComDigitacao("Product Manager GPT", resposta, 'pmgpt-message', () => {
-                    // Callback após a mensagem da IA ser exibida
+                    // Este é o CALLBACK executado APÓS a mensagem da IA terminar de digitar.
                     
-                    // Ocultar o indicador e reativar o input
+                    // 5. Ocultar o indicador e reativar o input
                     mostrarIndicadorDigitacao(false);
                     perguntaInput.disabled = false;
                     document.getElementById('sendButton').disabled = false;
                     isTyping = false;
                     perguntaInput.focus(); // Coloca o foco de volta
                     
-                    // Salvar o novo estado da conversa
+                    // 6. Salvar o novo estado da conversa
                     salvarHistorico();
                 });
-            }, 1000); // Atraso de 1 segundo
+            }, 1000); 
         });
 
-        // Limpar o conteúdo do campo de entrada
-        perguntaInput.value = '';
+        // O input.value = ''; foi movido para DENTRO do callback do usuário para garantir a ordem correta
     }
 }
-
 
 function verificarTecla(event) {
     if (event.key === "Enter") {
@@ -54,6 +60,8 @@ function verificarTecla(event) {
         enviarMensagem(); // Chama a função unificada
     }
 }
+
+// ... As outras funções (obterResposta, adicionarMensagemComDigitacao, etc.) seguem inalteradas
 
 
 function obterResposta(pergunta) {
