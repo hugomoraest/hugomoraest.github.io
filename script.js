@@ -1,4 +1,4 @@
-// script.js - VERSÃO FINAL COM INTEGRAÇÃO BACEN ROBUSTA
+// script.js - VERSÃO FINAL COM INTEGRAÇÃO BACEN E IBGE
 
 // Variável de controle para o estado de digitação
 let isTyping = false;
@@ -6,7 +6,8 @@ let isTyping = false;
 // Substitua o placeholder pela sua URL real do LinkedIn
 const LINKEDIN_URL = "https://www.linkedin.com/in/hugomoraesapm/"; 
 const LINKEDIN_TRIGGERS = ['linkedin', 'linkar perfil', 'quem é o pm', 'portfolio', 'currículo', 'quem é o dono'];
-const COTACAO_TRIGGERS = ['cotação de hoje', 'me da um dado', 'o que é importante', 'o que importa', 'valor do dolar', 'cotação'];
+// Adicionado 'ipca' e 'inflação' aos triggers
+const COTACAO_TRIGGERS = ['cotação de hoje', 'me da um dado', 'o que é importante', 'o que importa', 'valor do dolar', 'cotação', 'ipca', 'inflação'];
 
 // --- Funções de Cotação Real (BACEN) e Simulação ---
 
@@ -24,7 +25,6 @@ function formatDateForBACEN(date) {
  * Gera um número decimal aleatório para ativos simulados.
  */
 function gerarCotacao(min, max) {
-    // Usa toLocaleString para garantir a vírgula como separador decimal (formato PT-BR)
     return (Math.random() * (max - min) + min).toFixed(2).replace('.', ',');
 }
 
@@ -33,9 +33,8 @@ function gerarCotacao(min, max) {
  */
 async function buscarCotacaoDolar() {
     const today = new Date();
-    let dolarCompra = 'R$ 5,00 (Valor indisponível)'; // Fallback
+    let dolarCompra = 'R$ 5,00 (Valor indisponível - Falha na Matriz)'; // Fallback
 
-    // Tenta buscar cotação dos últimos 7 dias
     for (let i = 1; i <= 7; i++) {
         const dateToFetch = new Date(today);
         dateToFetch.setDate(today.getDate() - i); 
@@ -55,11 +54,43 @@ async function buscarCotacaoDolar() {
                 return dolarCompra;
             }
         } catch (error) {
-            console.warn(`Tentativa de busca falhou para o dia ${dataBusca}. Tentando o dia anterior...`);
+            console.warn(`Tentativa de busca BACEN falhou para o dia ${dataBusca}. Tentando o dia anterior...`);
         }
     }
     
-    return dolarCompra; // Retorna o fallback
+    return dolarCompra; 
+}
+
+/**
+ * Busca o último valor publicado do IPCA (série 1737).
+ */
+async function buscarIPCA() {
+    // API do IBGE - Série 1737 (IPCA - Variação Mensal) - Limitando ao último valor
+    const API_URL = `https://servicodados.ibge.gov.br/api/v3/agregados/1737/periodos/last/variaveis/2265?localidades=N1[all]`;
+    
+    let ipcaInfo = 'IPCA: N/D (Falha na Matriz)'; // Fallback
+    
+    try {
+        const response = await fetch(API_URL);
+        const data = await response.json();
+        
+        // Estrutura de dados do IBGE: [variáveis][0].resultados[0].series[0].serie
+        if (data.length > 0 && data[0].resultados.length > 0 && data[0].resultados[0].series.length > 0) {
+            const serie = data[0].resultados[0].series[0].serie;
+            const ultimoPeriodo = Object.keys(serie).pop();
+            const valor = serie[ultimoPeriodo];
+            
+            // O IPCA é publicado com o valor do mês anterior (ex: Outubro publica Setembro)
+            const mesPublicacao = parseInt(ultimoPeriodo.substring(4, 6)); // MM do AAAAmm
+            const nomeMes = new Date(2000, mesPublicacao - 1, 1).toLocaleString('pt-BR', { month: 'long' });
+            
+            ipcaInfo = `IPCA: ${valor.replace('.', ',')}% (Mês de ${nomeMes})`;
+        }
+    } catch (error) {
+        console.error("Erro ao buscar dados do IBGE:", error);
+    }
+    
+    return ipcaInfo;
 }
 
 async function gerarRespostaCotacaoSimulada(pergunta, callback) {
@@ -72,25 +103,29 @@ async function gerarRespostaCotacaoSimulada(pergunta, callback) {
         `ITUB4: R$ ${gerarCotacao(28, 32)} (${gerarCotacao(-1.5, 1.5)}%)`
     ];
     const criptos = [
-        `Bitcoin: $ ${gerarCotacao(60000, 70000)}`,
-        `Ethereum: $ ${gerarCotacao(3000, 4000)}`,
-        `Solana: $ ${gerarCotacao(140, 160)}`
+        `Bitcoin: $ ${gerarCotacao(120000, 125000)}`,
+        `Ethereum: $ ${gerarCotacao(4400, 4800)}`,
+        `Solana: $ ${gerarCotacao(200, 250)}`
     ];
     
-    // 2. BUSCA COTAÇÃO REAL DO DÓLAR (API BACEN) - AGORA ROBUSTA
-    const dolarCompra = await buscarCotacaoDolar();
+    // 2. BUSCA DADOS REAIS
+    const [dolarCompra, ipcaValor] = await Promise.all([
+        buscarCotacaoDolar(), 
+        buscarIPCA()
+    ]);
 
 
     // 3. MONTA A RESPOSTA FINAL
     const respostaHTML = `
         Desculpe, a **matriz de priorização** para sua pergunta está instável. No entanto, aqui estão **dados urgentes** em tempo real para ajudar na sua tomada de decisão:
         <br><br>
-        <strong>Cotações Reais e Simuladas (Último Dia Útil/Simulado):</strong><br>
+        <strong>Cenário Macroeconômico:</strong><br>
         - Dólar Comercial: ${dolarCompra}<br>
-        - S&P 500: ${sp500}<br><br>
+        - ${ipcaValor}<br><br>
         
-        <strong>Ações Brasil (Top 3 Simuladas):</strong><br>
-        - ${acoes.join('<br>- ')}<br><br>
+        <strong>Mercado Financeiro (Simulado):</strong><br>
+        - S&P 500: ${sp500}<br>
+        - Ações Brasil (Top 3): ${acoes.join('<br>- ')}<br><br>
         
         <strong>Criptomoedas (Top 3 Simuladas):</strong><br>
         - ${criptos.join('<br>- ')}<br>
@@ -332,7 +367,6 @@ async function enviarMensagem() {
             adicionarMensagemComDigitacao("Você", pergunta, 'user-message', () => {
                 mostrarIndicadorDigitacao(true);
                 
-                // Reduzimos o timeout aqui para 10ms, pois a busca real por si só levará tempo
                 setTimeout(async () => {
                     // Espera a função ASYNC retornar os dados da API
                     await gerarRespostaCotacaoSimulada(pergunta, () => {
@@ -352,8 +386,8 @@ async function enviarMensagem() {
         // INÍCIO DO FLUXO NORMAL DE CONVERSA
         
         isTyping = true;
-        perguntaInput.disabled = true;
-        sendButton.disabled = true;
+        perguntaInput.disabled = false;
+        sendButton.disabled = false;
         
         const resposta = obterResposta(pergunta);
         
@@ -483,17 +517,3 @@ function mostrarIndicadorDigitacao(show) {
     const chatMessages = document.getElementById('chatMessages');
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
-
-
-document.addEventListener('DOMContentLoaded', () => {
-    carregarHistorico();
-    
-    const body = document.body;
-    const toggleButton = document.getElementById('toggleNightMode');
-    if (localStorage.getItem('darkMode') === 'enabled') {
-        body.classList.add('dark-mode');
-    }
-    toggleButton.onclick = alternarModoNoturno;
-    
-    document.getElementById('perguntaInput').focus();
-});
