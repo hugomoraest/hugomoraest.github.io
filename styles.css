@@ -7,7 +7,7 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background-color: #f7f7f7; /* Cor de fundo mais suave */
+    background-color: #f7f7f7;
     transition: background-color 0.3s ease;
 }
 
@@ -20,13 +20,12 @@ body.dark-mode {
     width: 100%;
     max-width: 400px;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Sombra mais destacada */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     display: flex;
     flex-direction: column;
     max-height: 90vh;
     background-color: #fff;
     transition: background-color 0.3s ease;
-    /* Animação de entrada */
     animation: fadeIn 0.5s ease-out;
 }
 
@@ -41,7 +40,7 @@ body.dark-mode {
 }
 
 .chat-header {
-    display: flex; /* Usado para melhor alinhamento */
+    display: flex;
     flex-direction: column;
     background-color: #0077cc;
     color: #fff;
@@ -49,7 +48,7 @@ body.dark-mode {
     text-align: left;
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
-    position: relative; /* Para posicionar o botão */
+    position: relative;
 }
 
 .chat-header h1 {
@@ -60,11 +59,10 @@ body.dark-mode {
 .subtitle {
     font-size: 14px;
     margin-top: 5px;
-    /* Remover margin-left desnecessário */
 }
 
 #toggleNightMode {
-    position: absolute; /* Posicionamento fixo no cabeçalho */
+    position: absolute;
     top: 15px;
     right: 15px;
     padding: 6px 10px;
@@ -148,7 +146,7 @@ body.dark-mode {
 .chat-message {
     margin-bottom: 12px;
     display: flex;
-    align-items: flex-end; /* Alinha o carimbo com a bolha */
+    align-items: flex-end;
 }
 
 .message-content {
@@ -157,18 +155,18 @@ body.dark-mode {
     max-width: 85%;
     position: relative;
     font-size: 14px;
-    word-wrap: break-word; /* Para garantir que o texto quebre corretamente */
+    word-wrap: break-word;
 }
 
 .user-message .message-content {
-    background-color: #dcf8c6; /* Verde claro */
-    margin-left: auto; /* Alinha à direita */
+    background-color: #dcf8c6;
+    margin-left: auto;
     border-bottom-right-radius: 5px;
 }
 
 .pmgpt-message .message-content {
-    background-color: #f1f0f0; /* Cinza claro */
-    margin-right: auto; /* Alinha à esquerda */
+    background-color: #f1f0f0;
+    margin-right: auto;
     border-bottom-left-radius: 5px;
 }
 
@@ -176,16 +174,13 @@ body.dark-mode {
     background-color: #444;
 }
 
-
-/* Estilo para o carimbo de data/hora */
 .timestamp {
     font-size: 10px;
     color: #999;
     margin: 0 5px;
-    align-self: flex-end; /* Alinha ao fim do container flex */
+    align-self: flex-end;
 }
 
-/* Estilo para o ícone de avatar */
 .avatar-icon {
     font-size: 18px;
     margin-right: 5px;
@@ -198,13 +193,13 @@ body.dark-mode {
 
 .user-message .avatar-icon {
     color: #4CAF50;
-    order: 2; /* Move o ícone do usuário para a direita da bolha */
+    order: 2;
     margin-left: 5px;
     margin-right: 0;
 }
 
 .user-message .message-content {
-    order: 1; /* Move o conteúdo para a esquerda do ícone do usuário */
+    order: 1;
 }
 
 /* --- Indicador de Digitação (Typing Indicator) --- */
@@ -214,8 +209,7 @@ body.dark-mode {
     padding: 10px 15px;
     font-size: 14px;
     color: #888;
-    /* Alinhamento ao canto inferior esquerdo */
-    justify-content: flex-start; 
+    justify-content: flex-start;
 }
 
 .typing-dot {
