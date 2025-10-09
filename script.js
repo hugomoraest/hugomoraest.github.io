@@ -85,7 +85,7 @@ function carregarHistorico() {
         chatMessages.scrollTop = chatMessages.scrollHeight;
     } else {
         setTimeout(() => {
-            adicionarMensagemComDigitacao("Product Manager GPT", "Bem-vindo, stakeholder! Pronto para ter suas perguntas respondidas com clareza e zero clichês? (Resposta: **Depende**).", 'pmgpt-message');
+            adicionarMensagemComDigitacao("Product Manager GPT", "Bem-vindo, stakeholder! Pronto para ter suas perguntas respondidas com clareza e zero clichês?", 'pmgpt-message');
         }, 100);
     }
 }
