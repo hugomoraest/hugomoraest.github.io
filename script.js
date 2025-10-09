@@ -261,7 +261,7 @@ function abrirLinkedInEResponder(pergunta, callback) {
 }
 
 function exibirMensagemModoNoturnoEspecial() {
-    const mensagem = "Legal essa feature de modo noturno, não é? Fizemos isso depois de **35%** dos usuários implorarem por isso nas pesquisas de satisfação.";
+    const mensagem = "Legal essa feature de modo noturno, não é? Fizemos isso depois de **35%** dos usuários implorarem por isso nas pesquisas de satisfação. Esperamos que eles continuem pagando pelo nosso serviço!";
     
     adicionarMensagemComDigitacao("Product Manager GPT", mensagem, 'pmgpt-message', () => {
         // Nada precisa acontecer
