@@ -1,19 +1,16 @@
-// script.js - VERSÃO FINAL COM INTEGRAÇÃO BACEN E IBGE
+// script.js - VERSÃO FINAL COM LINK DE MÍDIA ALEATÓRIO
 
 // Variável de controle para o estado de digitação
 let isTyping = false;
 
 // Substitua o placeholder pela sua URL real do LinkedIn
 const LINKEDIN_URL = "https://www.linkedin.com/in/hugomoraesapm/"; 
+const MIDIA_URL = "https://www.linkedin.com/feed/update/urn:li:activity:7148427335963222017/?originalSubdomain=pt";
 const LINKEDIN_TRIGGERS = ['linkedin', 'linkar perfil', 'quem é o pm', 'portfolio', 'currículo', 'quem é o dono'];
-// Adicionado 'ipca' e 'inflação' aos triggers
 const COTACAO_TRIGGERS = ['cotação de hoje', 'me da um dado', 'o que é importante', 'o que importa', 'valor do dolar', 'cotação', 'ipca', 'inflação'];
 
 // --- Funções de Cotação Real (BACEN) e Simulação ---
 
-/**
- * Retorna a data em formato MM-DD-AAAA com aspas para a API do BACEN.
- */
 function formatDateForBACEN(date) {
     const day = String(date.getDate()).padStart(2, '0');
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -21,19 +18,13 @@ function formatDateForBACEN(date) {
     return `'${month}-${day}-${year}'`;
 }
 
-/**
- * Gera um número decimal aleatório para ativos simulados.
- */
 function gerarCotacao(min, max) {
     return (Math.random() * (max - min) + min).toFixed(2).replace('.', ',');
 }
 
-/**
- * Busca a cotação do Dólar, voltando até 7 dias, se necessário (robusto contra feriados/fins de semana).
- */
 async function buscarCotacaoDolar() {
     const today = new Date();
-    let dolarCompra = 'R$ 5,00 (Valor indisponível - Falha na Matriz)'; // Fallback
+    let dolarCompra = 'R$ 5,00 (Valor indisponível - Falha na Matriz)'; 
 
     for (let i = 1; i <= 7; i++) {
         const dateToFetch = new Date(today);
@@ -61,27 +52,21 @@ async function buscarCotacaoDolar() {
     return dolarCompra; 
 }
 
-/**
- * Busca o último valor publicado do IPCA (série 1737).
- */
 async function buscarIPCA() {
-    // API do IBGE - Série 1737 (IPCA - Variação Mensal) - Limitando ao último valor
     const API_URL = `https://servicodados.ibge.gov.br/api/v3/agregados/1737/periodos/last/variaveis/2265?localidades=N1[all]`;
     
-    let ipcaInfo = 'IPCA: N/D (Falha na Matriz)'; // Fallback
+    let ipcaInfo = 'IPCA: N/D (Falha na Matriz)';
     
     try {
         const response = await fetch(API_URL);
         const data = await response.json();
         
-        // Estrutura de dados do IBGE: [variáveis][0].resultados[0].series[0].serie
         if (data.length > 0 && data[0].resultados.length > 0 && data[0].resultados[0].series.length > 0) {
             const serie = data[0].resultados[0].series[0].serie;
             const ultimoPeriodo = Object.keys(serie).pop();
             const valor = serie[ultimoPeriodo];
             
-            // O IPCA é publicado com o valor do mês anterior (ex: Outubro publica Setembro)
-            const mesPublicacao = parseInt(ultimoPeriodo.substring(4, 6)); // MM do AAAAmm
+            const mesPublicacao = parseInt(ultimoPeriodo.substring(4, 6)); 
             const nomeMes = new Date(2000, mesPublicacao - 1, 1).toLocaleString('pt-BR', { month: 'long' });
             
             ipcaInfo = `IPCA: ${valor.replace('.', ',')}% (Mês de ${nomeMes})`;
@@ -137,7 +122,20 @@ async function gerarRespostaCotacaoSimulada(pergunta, callback) {
 }
 
 
-// --- Funções de Limpeza, Exportação e Histórico (Mantidas) ---
+// --- Funções de Mídia (NOVA FEATURE) ---
+
+function abrirLinkMidia(callback) {
+    // 1. Abre o link em uma nova aba
+    window.open(MIDIA_URL, '_blank');
+    
+    // 2. Resposta de confirmação
+    const resposta = "Sim! Nossas estratégias são tão inovadoras que **saímos na mídia**. O artigo completo está em uma nova aba. Não se preocupe, voltarei para ignorar sua pergunta em breve!";
+    
+    // 3. Adiciona a resposta no chat e chama o callback para reativar o input
+    adicionarMensagemComDigitacao("Product Manager GPT", resposta, 'pmgpt-message', callback);
+}
+
+// --- Funções de Fluxo e Utils (Mantidas) ---
 
 function limparHistorico(callback) {
     localStorage.removeItem('chatHistory');
@@ -246,8 +244,6 @@ function exportarHistoricoParaCSV() {
     document.body.removeChild(link);
 }
 
-// --- Funções de Interação e Fluxo (Continuação) ---
-
 function abrirLinkedInEResponder(pergunta, callback) {
     const newWindow = window.open(LINKEDIN_URL, '_blank');
     
@@ -261,7 +257,7 @@ function abrirLinkedInEResponder(pergunta, callback) {
 }
 
 function exibirMensagemModoNoturnoEspecial() {
-    const mensagem = "Legal essa feature de modo noturno, não é? Fizemos isso depois de **35%** dos usuários implorarem por isso nas pesquisas de satisfação. Esperamos que eles continuem pagando pelo nosso serviço!";
+    const mensagem = "Legal essa feature de modo noturno, não é? Fizemos isso depois de **35%** dos usuários implorarem por isso nas pesquisas de satisfação.";
     
     adicionarMensagemComDigitacao("Product Manager GPT", mensagem, 'pmgpt-message', () => {
         // Nada precisa acontecer
@@ -299,15 +295,12 @@ async function enviarMensagem() {
     const pergunta = perguntaInput.value.trim();
     const perguntaLower = pergunta.toLowerCase();
 
-    // 1. Comandos de Limpeza
     const isClearCommand = 
         (perguntaLower.includes('limpar') || perguntaLower.includes('limpe') || perguntaLower.includes('apagar') || perguntaLower.includes('apague')) && 
         (perguntaLower.includes('histórico') || perguntaLower.includes('conversa'));
     
-    // 2. Comandos de LinkedIn
     const isLinkedInCommand = LINKEDIN_TRIGGERS.some(trigger => perguntaLower.includes(trigger));
     
-    // 3. Comandos de Cotação
     const isCotacaoCommand = COTACAO_TRIGGERS.some(trigger => perguntaLower.includes(trigger));
 
 
@@ -368,7 +361,6 @@ async function enviarMensagem() {
                 mostrarIndicadorDigitacao(true);
                 
                 setTimeout(async () => {
-                    // Espera a função ASYNC retornar os dados da API
                     await gerarRespostaCotacaoSimulada(pergunta, () => {
                         mostrarIndicadorDigitacao(false);
                         perguntaInput.disabled = false;
@@ -383,12 +375,33 @@ async function enviarMensagem() {
             return; 
         }
         
-        // INÍCIO DO FLUXO NORMAL DE CONVERSA
+        // INÍCIO DO FLUXO NORMAL DE CONVERSA (com chance de Easter Egg Mídia)
         
         isTyping = true;
-        perguntaInput.disabled = false;
-        sendButton.disabled = false;
+        perguntaInput.disabled = true;
+        sendButton.disabled = true;
         
+        // 4. Lógica da Mídia (1 em 15 chances)
+        const mediaChance = Math.random();
+        if (mediaChance < 0.065) { // Aproximadamente 1 em 15 (6.5% de chance)
+             adicionarMensagemComDigitacao("Você", pergunta, 'user-message', () => {
+                mostrarIndicadorDigitacao(true);
+                setTimeout(() => {
+                    abrirLinkMidia(() => {
+                        mostrarIndicadorDigitacao(false);
+                        perguntaInput.disabled = false;
+                        sendButton.disabled = false;
+                        isTyping = false; 
+                        perguntaInput.value = '';
+                        perguntaInput.focus();
+                        salvarHistorico();
+                    });
+                }, 100);
+            });
+            return;
+        }
+
+        // Resposta padrão
         const resposta = obterResposta(pergunta);
         
         adicionarMensagemComDigitacao("Você", pergunta, 'user-message', () => {
@@ -517,3 +530,17 @@ function mostrarIndicadorDigitacao(show) {
     const chatMessages = document.getElementById('chatMessages');
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    carregarHistorico();
+    
+    const body = document.body;
+    const toggleButton = document.getElementById('toggleNightMode');
+    if (localStorage.getItem('darkMode') === 'enabled') {
+        body.classList.add('dark-mode');
+    }
+    toggleButton.onclick = alternarModoNoturno;
+    
+    document.getElementById('perguntaInput').focus();
+});
