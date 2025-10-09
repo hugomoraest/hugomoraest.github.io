@@ -104,6 +104,8 @@ function obterResposta(pergunta) {
 }
 
 
+// script.js - FUNÇÃO CORRIGIDA
+
 function adicionarMensagemComDigitacao(remetente, resposta, classe, callback = () => {}) {
     const chatMessages = document.getElementById('chatMessages');
     const mensagemElement = document.createElement('div');
@@ -116,7 +118,6 @@ function adicionarMensagemComDigitacao(remetente, resposta, classe, callback = (
     // Elemento do conteúdo da bolha
     const contentElement = document.createElement('div');
     contentElement.className = 'message-content';
-    
     
     // Adiciona o ícone e o conteúdo na ordem correta
     if (remetente === "Você") {
@@ -131,29 +132,25 @@ function adicionarMensagemComDigitacao(remetente, resposta, classe, callback = (
 
     let index = 0;
     
-    // O problema estava aqui: usamos textContent para garantir que o HTML (como <strong>) não cause problemas de contagem de caracteres durante a digitação.
-    const textoCru = resposta.replace(/<\/?strong>/g, ''); // Remove tags <strong> para contagem
-    const textoCompletoHTML = resposta; // Mantém o HTML para o innerHTML final
+    // Simplifica o texto que será usado para contagem de caracteres (ignorando tags HTML)
+    const textoCompleto = resposta; 
+    const textoCru = contentElement.textContent = resposta.replace(/<\/?strong>/g, '');
 
     function exibirProximoCaractere() {
         if (index < textoCru.length) {
             
-            // Usamos textoCompletoHTML.substring para pegar o texto com formatação HTML até o índice atual
-            // A substituição complexa abaixo garante que a tag <strong> abra e feche corretamente quando o caractere
-            // sendo exibido está dentro dela, mantendo o efeito de digitação.
-            let textoAtual = resposta.substring(0, resposta.indexOf(textoCru[index]) + 1);
-            
-            contentElement.innerHTML = textoAtual;
+            // CONTAGEM SEGURA: Apenas mostra o texto "cru" (sem tags) até o índice atual
+            // Este é o ponto chave para garantir que o fluxo de digitação não quebre por causa das tags 
+            contentElement.textContent = textoCru.substring(0, index + 1);
             index++;
             
-            // Velocidade de digitação
             const delay = remetente === "Product Manager GPT" ? 35 : 15; 
             setTimeout(exibirProximoCaractere, delay);
         } else {
             // Fim da digitação
             
-            // Garante que o texto final com todo o HTML (como <strong>) esteja correto
-            contentElement.innerHTML = textoCompletoHTML;
+            // Restaura o texto original, AGORA COM A FORMATAÇÃO HTML
+            contentElement.innerHTML = textoCompleto;
             
             // Adiciona o carimbo de data/hora
             const timestamp = document.createElement('span');
@@ -162,19 +159,11 @@ function adicionarMensagemComDigitacao(remetente, resposta, classe, callback = (
             mensagemElement.appendChild(timestamp);
 
             chatMessages.scrollTop = chatMessages.scrollHeight;
-            callback(); // Chama o callback para seguir o fluxo (ex: responder a IA)
+            callback(); // CHAMA O CALLBACK E PERMITE QUE A RESPOSTA DO GPT PROSSIGA!
         }
     }
 
     exibirProximoCaractere();
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-}
-
-function mostrarIndicadorDigitacao(show) {
-    const indicator = document.getElementById('typingIndicator');
-    indicator.style.display = show ? 'flex' : 'none';
-    const chatMessages = document.getElementById('chatMessages');
-    // Rola para o fim para mostrar o indicador
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
