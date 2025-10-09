@@ -129,7 +129,7 @@ function exportarHistoricoParaCSV() {
 }
 
 
-// --- Funções de Envio e Resposta (Inalteradas) ---
+// --- Funções de Envio e Resposta ---
 
 function enviarMensagem() {
     if (isTyping) return; 
@@ -139,12 +139,14 @@ function enviarMensagem() {
     const pergunta = perguntaInput.value.trim();
     const perguntaLower = pergunta.toLowerCase();
 
+    // Lógica para detectar comandos de limpeza
     const isClearCommand = 
         (perguntaLower.includes('limpar') || perguntaLower.includes('limpe') || perguntaLower.includes('apagar') || perguntaLower.includes('apague')) && 
         (perguntaLower.includes('histórico') || perguntaLower.includes('conversa'));
 
     if (pergunta !== '') {
         
+        // FLUXO DE COMANDO DE LIMPEZA
         if (isClearCommand) {
             
             isTyping = true;
@@ -165,8 +167,9 @@ function enviarMensagem() {
                 }, 500); 
             });
             return; 
-
         }
+        
+        // INÍCIO DO FLUXO NORMAL DE CONVERSA
         
         isTyping = true;
         perguntaInput.disabled = true;
