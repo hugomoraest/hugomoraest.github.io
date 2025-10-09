@@ -14,7 +14,7 @@ function limparHistorico(callback) {
     chatMessages.innerHTML = '';
     
     // Resposta de confirmação
-    adicionarMensagemComDigitacao("Product Manager GPT", "Certo, eu limpei todo o histórico da conversa! Vamos começar de novo.", 'pmgpt-message', callback);
+    adicionarMensagemComDigitacao("Product Fun Manager GPT", "Certo, eu limpei todo o histórico da conversa! Vamos começar de novo.", 'pmgpt-message', callback);
 }
 
 function carregarMensagensParaExportacao() {
@@ -80,7 +80,7 @@ function carregarHistorico() {
         chatMessages.scrollTop = chatMessages.scrollHeight;
     } else {
         setTimeout(() => {
-            adicionarMensagemComDigitacao("Product Manager GPT", "Bem-vindo, stakeholder! Pronto para ter suas perguntas respondidas com clareza e zero clichês? (Resposta: **Depende**).", 'pmgpt-message');
+            adicionarMensagemComDigitacao("Product Fun Manager GPT", "Bem-vindo, stakeholder! Pronto para ter suas perguntas respondidas com clareza e zero clichês?", 'pmgpt-message');
         }, 100);
     }
 }
@@ -121,7 +121,7 @@ function exportarHistoricoParaCSV() {
 // --- Funções de Interação e Fluxo ---
 
 function exibirMensagemModoNoturnoEspecial() {
-    const mensagem = "Legal essa feature de modo noturno, não é? Fizemos isso depois de **11,5%** dos usuários implorarem por isso nas pesquisas de satisfação.";
+    const mensagem = "Legal essa feature de modo noturno, não é? Incluímos na última sprint depois de **35%** dos usuários implorarem por isso nas pesquisas de satisfação. Esperamos que eles continuem pagando nosso serviço!";
     
     adicionarMensagemComDigitacao("Product Manager GPT", mensagem, 'pmgpt-message', () => {
         // Nada precisa acontecer
