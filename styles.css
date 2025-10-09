@@ -280,14 +280,14 @@ body.dark-mode {
     position: fixed;
     top: 0;
     right: 0;
-    width: 300px;
-    max-width: 80vw; /* Garante que funcione bem em telas pequenas */
+    /* REDUÇÃO DE LARGURA */
+    width: 200px;
+    max-width: 80vw;
     height: 100%;
     background-color: #f7f7f7;
     box-shadow: -2px 0 5px rgba(0, 0, 0, 0.3);
     z-index: 999;
     padding: 20px;
-    /* Estado inicial: Retraído */
     transform: translateX(100%);
     transition: transform 0.4s ease-in-out;
     overflow-y: auto;
@@ -308,6 +308,7 @@ body.dark-mode {
     border-bottom: 1px solid #ccc;
     padding-bottom: 10px;
     text-align: center;
+    font-size: 16px; /* Ajuste o tamanho do título */
 }
 
 .dark-mode .side-panel h2 {
@@ -329,16 +330,18 @@ body.dark-mode {
 }
 
 
-/* Ícones de Contato */
+/* Ícones de Contato - MUDANÇA PARA COLUNA */
 .contact-icons {
     display: flex;
-    justify-content: space-around;
+    flex-direction: column; /* Organiza os itens em coluna */
+    align-items: center; /* Centraliza os ícones */
+    gap: 15px; /* Espaçamento entre os ícones */
     padding: 30px 10px;
     margin-bottom: 20px;
 }
 
 .contact-icons a {
-    font-size: 48px;
+    font-size: 40px; /* Levemente menor para caber melhor */
     color: #0077cc;
     transition: color 0.3s;
 }
@@ -360,7 +363,7 @@ body.dark-mode {
     color: white;
     border: none;
     border-radius: 5px;
-    font-size: 16px;
+    font-size: 14px; /* Ajuste o tamanho da fonte */
     cursor: pointer;
     transition: background-color 0.3s;
 }
