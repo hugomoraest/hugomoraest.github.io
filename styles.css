@@ -63,10 +63,8 @@ body.dark-mode {
     margin-top: 5px;
 }
 
-#toggleNightMode {
+#toggleNightMode, #exportButton {
     position: absolute;
-    top: 15px;
-    right: 15px;
     padding: 6px 10px;
     background-color: rgba(255, 255, 255, 0.2);
     color: #fff;
@@ -77,7 +75,17 @@ body.dark-mode {
     transition: background-color 0.3s;
 }
 
-#toggleNightMode:hover {
+#toggleNightMode {
+    top: 15px;
+    right: 15px;
+}
+
+#exportButton {
+    top: 45px; /* Posição abaixo do Modo Noturno */
+    right: 15px;
+}
+
+#toggleNightMode:hover, #exportButton:hover {
     background-color: rgba(255, 255, 255, 0.3);
 }
 
