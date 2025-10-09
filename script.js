@@ -1,4 +1,4 @@
-// script.js - VERSÃO FINAL (Limpeza por Comando, Correções, e EXPORTAÇÃO CSV)
+// script.js - VERSÃO FINAL (Contador de Modo Noturno, Limpeza por Comando, e Exportação CSV)
 
 // Variável de controle para o estado de digitação
 let isTyping = false;
@@ -21,7 +21,6 @@ function carregarMensagensParaExportacao() {
     const messages = [];
     const chatMessagesDiv = document.getElementById('chatMessages');
     
-    // Percorre todos os elementos de mensagem (ignorando o indicador de digitação)
     Array.from(chatMessagesDiv.children).forEach(msgElement => {
         if (msgElement.classList.contains('chat-message')) {
             const iconElement = msgElement.querySelector('.avatar-icon');
@@ -29,7 +28,6 @@ function carregarMensagensParaExportacao() {
             
             const remetente = iconElement.classList.contains('fa-user-circle') ? "Você" : "Product Manager GPT";
             
-            // Remove as tags HTML (como <strong>) para exportar apenas o texto puro
             const texto = msgElement.querySelector('.message-content').textContent.trim(); 
             
             const timestampElement = msgElement.querySelector('.timestamp');
@@ -42,10 +40,7 @@ function carregarMensagensParaExportacao() {
 }
 
 function salvarHistorico() {
-    // Reutiliza a função de exportação para obter a lista completa
     const messages = carregarMensagensParaExportacao();
-    
-    // Salva o histórico completo no localStorage
     localStorage.setItem('chatHistory', JSON.stringify(messages));
 }
 
@@ -64,7 +59,7 @@ function carregarHistorico() {
             
             const contentElement = document.createElement('div');
             contentElement.className = 'message-content';
-            contentElement.innerHTML = msg.texto; // Usa innerHTML para manter o negrito (se houver)
+            contentElement.innerHTML = msg.texto; 
 
             const timestamp = document.createElement('span');
             timestamp.className = 'timestamp';
@@ -85,7 +80,7 @@ function carregarHistorico() {
         chatMessages.scrollTop = chatMessages.scrollHeight;
     } else {
         setTimeout(() => {
-            adicionarMensagemComDigitacao("Product Manager GPT", "Bem-vindo, stakeholder! Pronto para ter suas perguntas respondidas com clareza e zero clichês?", 'pmgpt-message');
+            adicionarMensagemComDigitacao("Product Manager GPT", "Bem-vindo, stakeholder! Pronto para ter suas perguntas respondidas com clareza e zero clichês? (Resposta: **Depende**).", 'pmgpt-message');
         }, 100);
     }
 }
@@ -101,35 +96,64 @@ function exportarHistoricoParaCSV() {
     }
     
     const csvContent = [];
-    // Cabeçalho do CSV
     csvContent.push(["Remetente", "Horário", "Mensagem"].join(";")); 
 
-    // Conteúdo
     messages.forEach(msg => {
-        // Remove quebras de linha e vírgulas do texto para não quebrar a formatação CSV
         const cleanedText = msg.texto.replace(/(\r\n|\n|\r)/gm, " ").replace(/"/g, '""'); 
         csvContent.push([`"${msg.remetente}"`, `"${msg.timestamp}"`, `"${cleanedText}"`].join(";"));
     });
 
     const csvString = csvContent.join("\n");
 
-    // Cria um blob (arquivo) e dispara o download
     const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
     
-    // Define o nome do arquivo
     link.setAttribute("href", url);
     link.setAttribute("download", `pmgpt_historico_${new Date().toISOString().slice(0, 10)}.csv`);
     
-    // Dispara o clique e a remoção
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
 }
 
 
-// --- Funções de Envio e Resposta ---
+// --- Funções de Interação e Fluxo ---
+
+function exibirMensagemModoNoturnoEspecial() {
+    const mensagem = "Legal essa feature de modo noturno, não é? Fizemos isso depois de **11,5%** dos usuários implorarem por isso nas pesquisas de satisfação.";
+    
+    // Adiciona a mensagem, mas sem callback para não interromper o fluxo principal
+    adicionarMensagemComDigitacao("Product Manager GPT", mensagem, 'pmgpt-message', () => {
+        // Nada precisa acontecer
+    });
+}
+
+function alternarModoNoturno() {
+    const body = document.body;
+    body.classList.toggle('dark-mode');
+    
+    // --- LÓGICA DE CONTADOR ---
+    let nightModeToggleCount = localStorage.getItem('nightModeToggleCount') || 0;
+    
+    nightModeToggleCount = parseInt(nightModeToggleCount) + 1;
+    localStorage.setItem('nightModeToggleCount', nightModeToggleCount);
+
+    // Salva a preferência de cor
+    if (body.classList.contains('dark-mode')) {
+        localStorage.setItem('darkMode', 'enabled');
+    } else {
+        localStorage.setItem('darkMode', 'disabled');
+    }
+    
+    // DISPARADOR: Se o contador for igual a 2 (a segunda vez que o botão foi pressionado)
+    if (nightModeToggleCount === 2) {
+        setTimeout(exibirMensagemModoNoturnoEspecial, 1000); 
+        
+        // Zera o contador para que a mensagem não apareça novamente
+        localStorage.setItem('nightModeToggleCount', 0);
+    }
+}
 
 function enviarMensagem() {
     if (isTyping) return; 
@@ -302,16 +326,6 @@ function mostrarIndicadorDigitacao(show) {
     indicator.style.display = show ? 'flex' : 'none';
     const chatMessages = document.getElementById('chatMessages');
     chatMessages.scrollTop = chatMessages.scrollHeight;
-}
-
-function alternarModoNoturno() {
-    const body = document.body;
-    body.classList.toggle('dark-mode');
-    if (body.classList.contains('dark-mode')) {
-        localStorage.setItem('darkMode', 'enabled');
-    } else {
-        localStorage.setItem('darkMode', 'disabled');
-    }
 }
 
 
