@@ -1,20 +1,115 @@
-// script.js - VERSÃO FINAL E COMPLETA COM EASTER EGG ÚNICO
+// script.js - VERSÃO FINAL COM INTEGRAÇÃO BACEN
 
 // Variável de controle para o estado de digitação
 let isTyping = false;
 
-// --- Funções de Limpeza e Histórico ---
+// Substitua o placeholder pela sua URL real do LinkedIn
+const LINKEDIN_URL = "SUA_URL_DO_LINKEDIN_AQUI"; 
+const LINKEDIN_TRIGGERS = ['linkedin', 'linkar perfil', 'quem é o pm', 'portfolio', 'currículo', 'me contrata'];
+const COTACAO_TRIGGERS = ['cotação de hoje', 'me da um dado', 'o que é importante', 'o que importa', 'valor do dolar', 'cotação'];
+
+// --- Funções de Cotação Real (BACEN) e Simulação ---
+
+/**
+ * Retorna a data do dia anterior no formato MM-DD-AAAA para a API do BACEN.
+ * Esta é a data mais confiável para o BACEN.
+ */
+function getYesterdayDateForBACEN() {
+    const today = new Date();
+    // Clona e subtrai um dia
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1); 
+
+    // Formato MM-DD-AAAA
+    const day = String(yesterday.getDate()).padStart(2, '0');
+    const month = String(yesterday.getMonth() + 1).padStart(2, '0');
+    const year = yesterday.getFullYear();
+
+    return `'${month}-${day}-${year}'`; // Retorna com aspas para URL
+}
+
+/**
+ * Gera um número decimal aleatório para ativos simulados.
+ */
+function gerarCotacao(min, max) {
+    // Usa toLocaleString para garantir a vírgula como separador decimal (formato PT-BR)
+    return (Math.random() * (max - min) + min).toFixed(2).replace('.', ',');
+}
+
+async function buscarCotacaoDolar() {
+    const dataBusca = getYesterdayDateForBACEN();
+    // Moeda='USD' e DataCotacao='MM-DD-AAAA'
+    const API_URL = `https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/CotacaoMoedaDia(Moeda=@Moeda,DataCotacao=@DataCotacao)?@Moeda='USD'&@DataCotacao=${dataBusca}&$format=json`;
+    
+    let dolarCompra = 'R$ 5,00 (Valor indisponível)'; // Fallback
+
+    try {
+        const response = await fetch(API_URL);
+        const data = await response.json();
+
+        if (data.value && data.value.length > 0) {
+            const cotacao = data.value[0].cotacaoCompra; // Dólar de Compra
+            const dataCotacao = new Date(data.value[0].dataHoraCotacao).toLocaleDateString('pt-BR');
+            
+            // Formatando para string com vírgula e 4 casas decimais para ser mais realista
+            dolarCompra = `R$ ${cotacao.toFixed(4).replace('.', ',')} (em ${dataCotacao})`;
+        }
+    } catch (error) {
+        console.error("Erro ao buscar cotação do BACEN, usando fallback:", error);
+    }
+    
+    return dolarCompra;
+}
+
+async function gerarRespostaCotacaoSimulada(pergunta, callback) {
+    
+    // 1. GERA COTAÇÕES SIMULADAS
+    const sp500 = gerarCotacao(4900, 5200);
+    const acoes = [
+        `PETR4: R$ ${gerarCotacao(30, 35)} (${gerarCotacao(-1.5, 1.5)}%)`,
+        `VALE3: R$ ${gerarCotacao(60, 70)} (${gerarCotacao(-1.5, 1.5)}%)`,
+        `ITUB4: R$ ${gerarCotacao(28, 32)} (${gerarCotacao(-1.5, 1.5)}%)`
+    ];
+    const criptos = [
+        `Bitcoin: $ ${gerarCotacao(60000, 70000)}`,
+        `Ethereum: $ ${gerarCotacao(3000, 4000)}`,
+        `Solana: $ ${gerarCotacao(140, 160)}`
+    ];
+    
+    // 2. BUSCA COTAÇÃO REAL DO DÓLAR (API BACEN)
+    const dolarCompra = await buscarCotacaoDolar();
+
+
+    // 3. MONTA A RESPOSTA FINAL
+    const respostaHTML = `
+        Desculpe, a **matriz de priorização** para sua pergunta está instável. No entanto, aqui estão **dados urgentes** em tempo real para ajudar na sua tomada de decisão:
+        <br><br>
+        <strong>Cotações Reais e Simuladas (Último Dia Útil/Simulado):</strong><br>
+        - Dólar Comercial: ${dolarCompra}<br>
+        - S&P 500: ${sp500}<br><br>
+        
+        <strong>Ações Brasil (Top 3 Simuladas):</strong><br>
+        - ${acoes.join('<br>- ')}<br><br>
+        
+        <strong>Criptomoedas (Top 3 Simuladas):</strong><br>
+        - ${criptos.join('<br>- ')}<br>
+        <br>
+        Obrigado por priorizar o que realmente importa.
+    `;
+    
+    adicionarMensagemComDigitacao("Product Manager GPT", respostaHTML, 'pmgpt-message', callback);
+}
+
+
+// --- Funções de Limpeza, Exportação e Histórico (Mantidas) ---
 
 function limparHistorico(callback) {
-    // Remove o histórico salvo
     localStorage.removeItem('chatHistory');
     
-    // Limpa a interface imediatamente
     const chatMessages = document.getElementById('chatMessages');
     chatMessages.innerHTML = '';
     
-    // Resposta de confirmação
-    adicionarMensagemComDigitacao("Product Fun Manager GPT", "Certo, eu limpei todo o histórico da conversa! Vamos começar de novo.", 'pmgpt-message', callback);
+    adicionarMensagemComDigitacao("Product Manager GPT", "Certo, eu limpei todo o histórico da conversa! Vamos começar de novo.", 'pmgpt-message', callback);
 }
 
 function carregarMensagensParaExportacao() {
@@ -80,12 +175,10 @@ function carregarHistorico() {
         chatMessages.scrollTop = chatMessages.scrollHeight;
     } else {
         setTimeout(() => {
-            adicionarMensagemComDigitacao("Product Fun Manager GPT", "Bem-vindo, stakeholder! Pronto para ter suas perguntas respondidas com clareza e zero clichês?", 'pmgpt-message');
+            adicionarMensagemComDigitacao("Product Manager GPT", "Bem-vindo, stakeholder! Pronto para ter suas perguntas respondidas com clareza e zero clichês? (Resposta: **Depende**).", 'pmgpt-message');
         }, 100);
     }
 }
-
-// --- Funções de Exportação CSV ---
 
 function exportarHistoricoParaCSV() {
     const messages = carregarMensagensParaExportacao();
@@ -117,11 +210,25 @@ function exportarHistoricoParaCSV() {
     document.body.removeChild(link);
 }
 
+// --- Funções de Interação e Fluxo (Continuação) ---
 
-// --- Funções de Interação e Fluxo ---
+function abrirLinkedInEResponder(pergunta, callback) {
+    // 1. Abre o link imediatamente
+    const newWindow = window.open(LINKEDIN_URL, '_blank');
+    
+    if (newWindow) {
+        newWindow.focus();
+    }
+    
+    // 2. Resposta contextualizada
+    const resposta = "Ah, então você quer fazer uma **análise de concorrentes** da minha carreira, hein? Sem problemas. O *roadmap* completo está na nova aba. 😉";
+    
+    // 3. Adiciona a resposta no chat e chama o callback para reativar o input
+    adicionarMensagemComDigitacao("Product Manager GPT", resposta, 'pmgpt-message', callback);
+}
 
 function exibirMensagemModoNoturnoEspecial() {
-    const mensagem = "Legal essa feature de modo noturno, não é? Incluímos na última sprint depois de **35%** dos usuários implorarem por isso nas pesquisas de satisfação. Esperamos que eles continuem pagando nosso serviço!";
+    const mensagem = "Legal essa feature de modo noturno, não é? Fizemos isso depois de **11,5%** dos usuários implorarem por isso nas pesquisas de satisfação.";
     
     adicionarMensagemComDigitacao("Product Manager GPT", mensagem, 'pmgpt-message', () => {
         // Nada precisa acontecer
@@ -132,31 +239,26 @@ function alternarModoNoturno() {
     const body = document.body;
     body.classList.toggle('dark-mode');
     
-    // --- LÓGICA DE CONTADOR ÚNICO ---
     let nightModeToggleCount = localStorage.getItem('nightModeToggleCount') || 0;
-    const messageShown = localStorage.getItem('nightModeMessageShown') === 'true'; // Flag de controle
+    const messageShown = localStorage.getItem('nightModeMessageShown') === 'true'; 
     
-    // 1. Incrementa e salva a contagem de cliques
     nightModeToggleCount = parseInt(nightModeToggleCount) + 1;
     localStorage.setItem('nightModeToggleCount', nightModeToggleCount);
 
-    // 2. Salva a preferência de cor
     if (body.classList.contains('dark-mode')) {
         localStorage.setItem('darkMode', 'enabled');
     } else {
         localStorage.setItem('darkMode', 'disabled');
     }
     
-    // 3. DISPARADOR ÚNICO: Se for o segundo clique E a mensagem nunca foi exibida
     if (nightModeToggleCount === 2 && !messageShown) {
         setTimeout(exibirMensagemModoNoturnoEspecial, 1000); 
-        
-        // **BLOQUEIO DEFINITIVO:** Seta a flag para true no localStorage
         localStorage.setItem('nightModeMessageShown', 'true');
     }
 }
 
-function enviarMensagem() {
+// --- FLUXO PRINCIPAL (ASYNC) ---
+async function enviarMensagem() {
     if (isTyping) return; 
 
     const perguntaInput = document.getElementById('perguntaInput');
@@ -164,16 +266,22 @@ function enviarMensagem() {
     const pergunta = perguntaInput.value.trim();
     const perguntaLower = pergunta.toLowerCase();
 
-    // Lógica para detectar comandos de limpeza
+    // 1. Comandos de Limpeza
     const isClearCommand = 
         (perguntaLower.includes('limpar') || perguntaLower.includes('limpe') || perguntaLower.includes('apagar') || perguntaLower.includes('apague')) && 
         (perguntaLower.includes('histórico') || perguntaLower.includes('conversa'));
+    
+    // 2. Comandos de LinkedIn
+    const isLinkedInCommand = LINKEDIN_TRIGGERS.some(trigger => perguntaLower.includes(trigger));
+    
+    // 3. Comandos de Cotação
+    const isCotacaoCommand = COTACAO_TRIGGERS.some(trigger => perguntaLower.includes(trigger));
+
 
     if (pergunta !== '') {
         
-        // FLUXO DE COMANDO DE LIMPEZA
+        // FLUXO DE COMANDOS DE ALTA PRIORIDADE
         if (isClearCommand) {
-            
             isTyping = true;
             perguntaInput.disabled = true;
             sendButton.disabled = true;
@@ -190,6 +298,55 @@ function enviarMensagem() {
                         perguntaInput.focus();
                     });
                 }, 500); 
+            });
+            return; 
+        }
+
+        if (isLinkedInCommand) {
+            isTyping = true;
+            perguntaInput.disabled = true;
+            sendButton.disabled = true;
+
+            adicionarMensagemComDigitacao("Você", pergunta, 'user-message', () => {
+                mostrarIndicadorDigitacao(true);
+                setTimeout(() => {
+                    abrirLinkedInEResponder(pergunta, () => {
+                        mostrarIndicadorDigitacao(false);
+                        perguntaInput.disabled = false;
+                        sendButton.disabled = false;
+                        isTyping = false; 
+                        perguntaInput.value = '';
+                        perguntaInput.focus();
+                        salvarHistorico();
+                    });
+                }, 500); 
+            });
+            return; 
+        }
+        
+        // FLUXO DE COMANDO COTAÇÃO (ASYNC)
+        if (isCotacaoCommand) {
+            
+            isTyping = true;
+            perguntaInput.disabled = true;
+            sendButton.disabled = true;
+
+            adicionarMensagemComDigitacao("Você", pergunta, 'user-message', () => {
+                mostrarIndicadorDigitacao(true);
+                
+                // O ASYNC está dentro do setTimeout para não travar o UI na fila de eventos
+                setTimeout(async () => {
+                    // Espera a função ASYNC retornar os dados da API
+                    await gerarRespostaCotacaoSimulada(pergunta, () => {
+                        mostrarIndicadorDigitacao(false);
+                        perguntaInput.disabled = false;
+                        sendButton.disabled = false;
+                        isTyping = false; 
+                        perguntaInput.value = '';
+                        perguntaInput.focus();
+                        salvarHistorico();
+                    });
+                }, 10); 
             });
             return; 
         }
