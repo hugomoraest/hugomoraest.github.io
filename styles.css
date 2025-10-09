@@ -8,7 +8,6 @@ body {
     align-items: center;
     min-height: 100vh;
     background-color: #f7f7f7; /* Cor de fundo "Dia" */
-    /* DURACAO CORRIGIDA: Transição de 0.3s para 1.3s */
     transition: background-color 1.3s ease, color 1.3s ease; 
 }
 
@@ -175,7 +174,7 @@ body.dark-mode {
     transition-delay: 0.3s;
 }
 
-/* CORREÇÃO AQUI: Garante que o texto do usuário seja preto no modo noturno */
+/* Garante que o texto do usuário seja preto no modo noturno */
 .dark-mode .user-message .message-content {
     color: #000;
 }
