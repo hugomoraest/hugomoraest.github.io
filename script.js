@@ -1,4 +1,4 @@
-// script.js - VERSÃO FINAL (Contador de Modo Noturno, Limpeza por Comando, e Exportação CSV)
+// script.js - VERSÃO FINAL E COMPLETA COM EASTER EGG ÚNICO
 
 // Variável de controle para o estado de digitação
 let isTyping = false;
@@ -123,7 +123,6 @@ function exportarHistoricoParaCSV() {
 function exibirMensagemModoNoturnoEspecial() {
     const mensagem = "Legal essa feature de modo noturno, não é? Fizemos isso depois de **11,5%** dos usuários implorarem por isso nas pesquisas de satisfação.";
     
-    // Adiciona a mensagem, mas sem callback para não interromper o fluxo principal
     adicionarMensagemComDigitacao("Product Manager GPT", mensagem, 'pmgpt-message', () => {
         // Nada precisa acontecer
     });
@@ -133,25 +132,27 @@ function alternarModoNoturno() {
     const body = document.body;
     body.classList.toggle('dark-mode');
     
-    // --- LÓGICA DE CONTADOR ---
+    // --- LÓGICA DE CONTADOR ÚNICO ---
     let nightModeToggleCount = localStorage.getItem('nightModeToggleCount') || 0;
+    const messageShown = localStorage.getItem('nightModeMessageShown') === 'true'; // Flag de controle
     
+    // 1. Incrementa e salva a contagem de cliques
     nightModeToggleCount = parseInt(nightModeToggleCount) + 1;
     localStorage.setItem('nightModeToggleCount', nightModeToggleCount);
 
-    // Salva a preferência de cor
+    // 2. Salva a preferência de cor
     if (body.classList.contains('dark-mode')) {
         localStorage.setItem('darkMode', 'enabled');
     } else {
         localStorage.setItem('darkMode', 'disabled');
     }
     
-    // DISPARADOR: Se o contador for igual a 2 (a segunda vez que o botão foi pressionado)
-    if (nightModeToggleCount === 2) {
+    // 3. DISPARADOR ÚNICO: Se for o segundo clique E a mensagem nunca foi exibida
+    if (nightModeToggleCount === 2 && !messageShown) {
         setTimeout(exibirMensagemModoNoturnoEspecial, 1000); 
         
-        // Zera o contador para que a mensagem não apareça novamente
-        localStorage.setItem('nightModeToggleCount', 0);
+        // **BLOQUEIO DEFINITIVO:** Seta a flag para true no localStorage
+        localStorage.setItem('nightModeMessageShown', 'true');
     }
 }
 
