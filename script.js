@@ -1,31 +1,23 @@
-// script.js - VERSÃO FINAL COM INTEGRAÇÃO BACEN
+// script.js - VERSÃO FINAL COM INTEGRAÇÃO BACEN ROBUSTA
 
 // Variável de controle para o estado de digitação
 let isTyping = false;
 
 // Substitua o placeholder pela sua URL real do LinkedIn
-const LINKEDIN_URL = "https://www.linkedin.com/in/hugomoraesapm/"; 
-const LINKEDIN_TRIGGERS = ['linkedin?', 'linkar perfil', 'quem é o pm', 'quem é você', 'quem e o dono','quem e você', 'currículo', 'quem é o dono'];
+const LINKEDIN_URL = "SUA_URL_DO_LINKEDIN_AQUI"; 
+const LINKEDIN_TRIGGERS = ['linkedin', 'linkar perfil', 'quem é o pm', 'portfolio', 'currículo', 'me contrata'];
 const COTACAO_TRIGGERS = ['cotação de hoje', 'me da um dado', 'o que é importante', 'o que importa', 'valor do dolar', 'cotação'];
 
 // --- Funções de Cotação Real (BACEN) e Simulação ---
 
 /**
- * Retorna a data do dia anterior no formato MM-DD-AAAA para a API do BACEN.
- * Esta é a data mais confiável para o BACEN.
+ * Retorna a data em formato MM-DD-AAAA com aspas para a API do BACEN.
  */
-function getYesterdayDateForBACEN() {
-    const today = new Date();
-    // Clona e subtrai um dia
-    const yesterday = new Date(today);
-    yesterday.setDate(today.getDate() - 1); 
-
-    // Formato MM-DD-AAAA
-    const day = String(yesterday.getDate()).padStart(2, '0');
-    const month = String(yesterday.getMonth() + 1).padStart(2, '0');
-    const year = yesterday.getFullYear();
-
-    return `'${month}-${day}-${year}'`; // Retorna com aspas para URL
+function formatDateForBACEN(date) {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `'${month}-${day}-${year}'`;
 }
 
 /**
@@ -36,29 +28,38 @@ function gerarCotacao(min, max) {
     return (Math.random() * (max - min) + min).toFixed(2).replace('.', ',');
 }
 
+/**
+ * Busca a cotação do Dólar, voltando até 7 dias, se necessário (robusto contra feriados/fins de semana).
+ */
 async function buscarCotacaoDolar() {
-    const dataBusca = getYesterdayDateForBACEN();
-    // Moeda='USD' e DataCotacao='MM-DD-AAAA'
-    const API_URL = `https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/CotacaoMoedaDia(Moeda=@Moeda,DataCotacao=@DataCotacao)?@Moeda='USD'&@DataCotacao=${dataBusca}&$format=json`;
-    
+    const today = new Date();
     let dolarCompra = 'R$ 5,00 (Valor indisponível)'; // Fallback
 
-    try {
-        const response = await fetch(API_URL);
-        const data = await response.json();
+    // Tenta buscar cotação dos últimos 7 dias
+    for (let i = 1; i <= 7; i++) {
+        const dateToFetch = new Date(today);
+        dateToFetch.setDate(today.getDate() - i); 
+        
+        const dataBusca = formatDateForBACEN(dateToFetch);
+        const API_URL = `https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/CotacaoMoedaDia(Moeda=@Moeda,DataCotacao=@DataCotacao)?@Moeda='USD'&@DataCotacao=${dataBusca}&$format=json`;
 
-        if (data.value && data.value.length > 0) {
-            const cotacao = data.value[0].cotacaoCompra; // Dólar de Compra
-            const dataCotacao = new Date(data.value[0].dataHoraCotacao).toLocaleDateString('pt-BR');
-            
-            // Formatando para string com vírgula e 4 casas decimais para ser mais realista
-            dolarCompra = `R$ ${cotacao.toFixed(4).replace('.', ',')} (em ${dataCotacao})`;
+        try {
+            const response = await fetch(API_URL);
+            const data = await response.json();
+
+            if (data.value && data.value.length > 0) {
+                const cotacao = data.value[0].cotacaoCompra; 
+                const dataCotacao = new Date(data.value[0].dataHoraCotacao).toLocaleDateString('pt-BR');
+                
+                dolarCompra = `R$ ${cotacao.toFixed(4).replace('.', ',')} (consolidado em ${dataCotacao})`;
+                return dolarCompra;
+            }
+        } catch (error) {
+            console.warn(`Tentativa de busca falhou para o dia ${dataBusca}. Tentando o dia anterior...`);
         }
-    } catch (error) {
-        console.error("Erro ao buscar cotação do BACEN, usando fallback:", error);
     }
     
-    return dolarCompra;
+    return dolarCompra; // Retorna o fallback
 }
 
 async function gerarRespostaCotacaoSimulada(pergunta, callback) {
@@ -76,7 +77,7 @@ async function gerarRespostaCotacaoSimulada(pergunta, callback) {
         `Solana: $ ${gerarCotacao(140, 160)}`
     ];
     
-    // 2. BUSCA COTAÇÃO REAL DO DÓLAR (API BACEN)
+    // 2. BUSCA COTAÇÃO REAL DO DÓLAR (API BACEN) - AGORA ROBUSTA
     const dolarCompra = await buscarCotacaoDolar();
 
 
@@ -213,17 +214,14 @@ function exportarHistoricoParaCSV() {
 // --- Funções de Interação e Fluxo (Continuação) ---
 
 function abrirLinkedInEResponder(pergunta, callback) {
-    // 1. Abre o link imediatamente
     const newWindow = window.open(LINKEDIN_URL, '_blank');
     
     if (newWindow) {
         newWindow.focus();
     }
     
-    // 2. Resposta contextualizada
     const resposta = "Ah, então você quer fazer uma **análise de concorrentes** da minha carreira, hein? Sem problemas. O *roadmap* completo está na nova aba. 😉";
     
-    // 3. Adiciona a resposta no chat e chama o callback para reativar o input
     adicionarMensagemComDigitacao("Product Manager GPT", resposta, 'pmgpt-message', callback);
 }
 
@@ -334,7 +332,7 @@ async function enviarMensagem() {
             adicionarMensagemComDigitacao("Você", pergunta, 'user-message', () => {
                 mostrarIndicadorDigitacao(true);
                 
-                // O ASYNC está dentro do setTimeout para não travar o UI na fila de eventos
+                // Reduzimos o timeout aqui para 10ms, pois a busca real por si só levará tempo
                 setTimeout(async () => {
                     // Espera a função ASYNC retornar os dados da API
                     await gerarRespostaCotacaoSimulada(pergunta, () => {
