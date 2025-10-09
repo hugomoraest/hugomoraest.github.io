@@ -104,7 +104,7 @@ function obterResposta(pergunta) {
 }
 
 
-// script.js - FUNÇÃO CORRIGIDA
+// script.js - FUNÇÃO CORRIGIDA PARA GARANTIR O CALLBACK
 
 function adicionarMensagemComDigitacao(remetente, resposta, classe, callback = () => {}) {
     const chatMessages = document.getElementById('chatMessages');
@@ -119,6 +119,7 @@ function adicionarMensagemComDigitacao(remetente, resposta, classe, callback = (
     const contentElement = document.createElement('div');
     contentElement.className = 'message-content';
     
+    
     // Adiciona o ícone e o conteúdo na ordem correta
     if (remetente === "Você") {
         mensagemElement.appendChild(contentElement);
@@ -132,16 +133,15 @@ function adicionarMensagemComDigitacao(remetente, resposta, classe, callback = (
 
     let index = 0;
     
-    // Simplifica o texto que será usado para contagem de caracteres (ignorando tags HTML)
-    const textoCompleto = resposta; 
-    const textoCru = contentElement.textContent = resposta.replace(/<\/?strong>/g, '');
+    // Remove qualquer tag HTML para garantir que o contador (index) e o texto sejam simples
+    const textoPuro = resposta.replace(/<[^>]*>/g, ''); 
+    const textoCompletoHTML = resposta;
 
     function exibirProximoCaractere() {
-        if (index < textoCru.length) {
+        if (index < textoPuro.length) {
             
-            // CONTAGEM SEGURA: Apenas mostra o texto "cru" (sem tags) até o índice atual
-            // Este é o ponto chave para garantir que o fluxo de digitação não quebre por causa das tags 
-            contentElement.textContent = textoCru.substring(0, index + 1);
+            // Exibe APENAS o texto puro com o efeito de digitação
+            contentElement.textContent = textoPuro.substring(0, index + 1);
             index++;
             
             const delay = remetente === "Product Manager GPT" ? 35 : 15; 
@@ -149,8 +149,8 @@ function adicionarMensagemComDigitacao(remetente, resposta, classe, callback = (
         } else {
             // Fim da digitação
             
-            // Restaura o texto original, AGORA COM A FORMATAÇÃO HTML
-            contentElement.innerHTML = textoCompleto;
+            // Restaura o texto original COM A FORMATAÇÃO HTML para que o negrito apareça
+            contentElement.innerHTML = textoCompletoHTML; 
             
             // Adiciona o carimbo de data/hora
             const timestamp = document.createElement('span');
@@ -159,15 +159,14 @@ function adicionarMensagemComDigitacao(remetente, resposta, classe, callback = (
             mensagemElement.appendChild(timestamp);
 
             chatMessages.scrollTop = chatMessages.scrollHeight;
-            callback(); // CHAMA O CALLBACK E PERMITE QUE A RESPOSTA DO GPT PROSSIGA!
+            // ESSA LINHA AQUI É A CHAVE: ela deve executar e permitir a resposta do GPT!
+            callback(); 
         }
     }
 
     exibirProximoCaractere();
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
-
-
 // --- Funções de Histórico e Inicialização ---
 
 function salvarHistorico() {
