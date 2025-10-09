@@ -8,7 +8,7 @@ body {
     align-items: center;
     min-height: 100vh;
     background-color: #f7f7f7; /* Cor de fundo "Dia" (quase branco) */
-    /* AUMENTADO: Transição de 0.3s para 1.3s */
+    /* DURACAO CORRIGIDA: Transição de 0.3s para 1.3s */
     transition: background-color 1.3s ease, color 1.3s ease; 
 }
 
@@ -16,8 +16,6 @@ body.dark-mode {
     background-color: #2c2c2c; /* Cor de fundo "Noite" (quase preto) */
     color: #fff;
 }
-
-/* --- O restante do CSS segue inalterado, apenas a seção body foi modificada --- */
 
 .chat-container {
     width: 100%;
@@ -28,7 +26,8 @@ body.dark-mode {
     flex-direction: column;
     max-height: 90vh;
     background-color: #fff;
-    transition: background-color 0.3s ease;
+    /* REFORÇO: Adicionando a transição de 1.3s aqui também */
+    transition: background-color 1.3s ease; 
     animation: fadeIn 0.5s ease-out;
 }
 
@@ -95,6 +94,8 @@ body.dark-mode {
     background-color: #fff;
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
+    /* Transição de 1.3s aqui também para a cor de fundo */
+    transition: background-color 1.3s ease; 
 }
 
 .dark-mode .chat-input {
@@ -111,7 +112,8 @@ body.dark-mode {
     outline: none;
     border-radius: 20px;
     margin-right: 8px;
-    transition: border-color 0.3s;
+    /* Transição mais curta para o foco do input */
+    transition: border-color 0.3s, background-color 1.3s ease, color 1.3s ease; 
 }
 
 .dark-mode #perguntaInput {
@@ -119,6 +121,8 @@ body.dark-mode {
     color: #fff;
     border-color: #555;
 }
+
+/* --- O restante do CSS segue inalterado --- */
 
 #perguntaInput:focus {
     border-color: #0077cc;
@@ -150,6 +154,8 @@ body.dark-mode {
     margin-bottom: 12px;
     display: flex;
     align-items: flex-end;
+    /* Transição nas mensagens também */
+    transition: color 1.3s ease; 
 }
 
 .message-content {
@@ -159,6 +165,8 @@ body.dark-mode {
     position: relative;
     font-size: 14px;
     word-wrap: break-word;
+    /* Transição de 1.3s para a cor de fundo das bolhas */
+    transition: background-color 1.3s ease; 
 }
 
 .user-message .message-content {
