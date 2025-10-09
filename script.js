@@ -1,4 +1,4 @@
-// script.js - VERSÃO FINAL DE ESTABILIDADE
+// script.js - VERSÃO FINAL DE ESTABILIDADE E FLUXO
 
 // Variável de controle para o estado de digitação
 let isTyping = false;
@@ -109,26 +109,21 @@ function adicionarMensagemComDigitacao(remetente, resposta, classe, callback = (
     const mensagemElement = document.createElement('div');
     mensagemElement.className = `chat-message ${classe}`;
     
-    // --- LÓGICA DE CRIAÇÃO DO ÍCONE MAIS SEGURA ---
-    let avatarHTML;
-    if (remetente === "Você") {
-        // Tenta usar Font Awesome, se falhar, usa emoji
-        avatarHTML = `<i class="fas fa-user-circle avatar-icon"></i>`;
-    } else {
-        avatarHTML = `<i class="fas fa-robot avatar-icon"></i>`;
-    }
-    
     // Elemento do conteúdo da bolha
     const contentElement = document.createElement('div');
     contentElement.className = 'message-content';
     
+    // Cria o elemento Icone de forma DOM nativa
+    const icon = document.createElement('i');
+    icon.className = remetente === "Você" ? "fas fa-user-circle avatar-icon" : "fas fa-robot avatar-icon";
     
-    // Adiciona o ícone e o conteúdo na ordem correta
+    
+    // Adiciona o ícone e o conteúdo na ordem correta (MUDANÇA CRÍTICA AQUI)
     if (remetente === "Você") {
         mensagemElement.appendChild(contentElement);
-        contentElement.insertAdjacentHTML('afterend', avatarHTML);
+        mensagemElement.appendChild(icon); // Adiciona o ícone depois do conteúdo
     } else {
-        contentElement.insertAdjacentHTML('beforebegin', avatarHTML);
+        mensagemElement.appendChild(icon); // Adiciona o ícone antes do conteúdo
         mensagemElement.appendChild(contentElement);
     }
     
@@ -136,7 +131,7 @@ function adicionarMensagemComDigitacao(remetente, resposta, classe, callback = (
 
     let index = 0;
     
-    // CORREÇÃO: Remove qualquer tag HTML para garantir que o contador e o texto sejam simples
+    // Remove qualquer tag HTML para garantir que o contador e o texto sejam simples
     const textoPuro = resposta.replace(/<[^>]*>/g, ''); 
     const textoCompletoHTML = resposta;
 
@@ -185,7 +180,10 @@ function salvarHistorico() {
     Array.from(chatMessagesDiv.children).forEach(msgElement => {
         if (msgElement.classList.contains('chat-message')) {
             // Tentativa de ler o remetente pelo ícone
-            const isUser = msgElement.querySelector('.avatar-icon').classList.contains('fa-user-circle');
+            const iconElement = msgElement.querySelector('.avatar-icon');
+            if (!iconElement) return; // Se não tem ícone, pula (erro)
+            
+            const isUser = iconElement.classList.contains('fa-user-circle');
             const remetente = isUser ? "Você" : "Product Manager GPT";
             const texto = msgElement.querySelector('.message-content').innerHTML; 
             const classe = msgElement.classList.contains('user-message') ? 'user-message' : 'pmgpt-message';
@@ -208,9 +206,9 @@ function carregarHistorico() {
             const mensagemElement = document.createElement('div');
             mensagemElement.className = `chat-message ${msg.classe}`;
             
-            // Icone
-            const iconClass = msg.remetente === "Você" ? "fas fa-user-circle" : "fas fa-robot";
-            const avatarHTML = `<i class="${iconClass} avatar-icon"></i>`;
+            // Cria o elemento Icone
+            const icon = document.createElement('i');
+            icon.className = msg.remetente === "Você" ? "fas fa-user-circle avatar-icon" : "fas fa-robot avatar-icon";
             
             // Conteúdo
             const contentElement = document.createElement('div');
@@ -225,9 +223,9 @@ function carregarHistorico() {
             // Reconstroi a ordem correta
             if (msg.remetente === "Você") {
                 mensagemElement.appendChild(contentElement);
-                contentElement.insertAdjacentHTML('afterend', avatarHTML);
+                mensagemElement.appendChild(icon);
             } else {
-                contentElement.insertAdjacentHTML('beforebegin', avatarHTML);
+                mensagemElement.appendChild(icon);
                 mensagemElement.appendChild(contentElement);
             }
             mensagemElement.appendChild(timestamp);
