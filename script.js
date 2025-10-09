@@ -1,4 +1,4 @@
-// script.js - VERSÃO FINAL E TOTALMENTE REVISADA
+// script.js - VERSÃO FINAL DE ESTABILIDADE
 
 // Variável de controle para o estado de digitação
 let isTyping = false;
@@ -109,9 +109,14 @@ function adicionarMensagemComDigitacao(remetente, resposta, classe, callback = (
     const mensagemElement = document.createElement('div');
     mensagemElement.className = `chat-message ${classe}`;
     
-    // Icone
-    const iconClass = remetente === "Você" ? "fas fa-user-circle" : "fas fa-robot";
-    const avatar = `<i class="${iconClass} avatar-icon"></i>`;
+    // --- LÓGICA DE CRIAÇÃO DO ÍCONE MAIS SEGURA ---
+    let avatarHTML;
+    if (remetente === "Você") {
+        // Tenta usar Font Awesome, se falhar, usa emoji
+        avatarHTML = `<i class="fas fa-user-circle avatar-icon"></i>`;
+    } else {
+        avatarHTML = `<i class="fas fa-robot avatar-icon"></i>`;
+    }
     
     // Elemento do conteúdo da bolha
     const contentElement = document.createElement('div');
@@ -121,9 +126,9 @@ function adicionarMensagemComDigitacao(remetente, resposta, classe, callback = (
     // Adiciona o ícone e o conteúdo na ordem correta
     if (remetente === "Você") {
         mensagemElement.appendChild(contentElement);
-        mensagemElement.appendChild(avatar);
+        contentElement.insertAdjacentHTML('afterend', avatarHTML);
     } else {
-        mensagemElement.appendChild(avatar);
+        contentElement.insertAdjacentHTML('beforebegin', avatarHTML);
         mensagemElement.appendChild(contentElement);
     }
     
@@ -179,11 +184,13 @@ function salvarHistorico() {
     
     Array.from(chatMessagesDiv.children).forEach(msgElement => {
         if (msgElement.classList.contains('chat-message')) {
-            const remetente = msgElement.querySelector('.avatar-icon').classList.contains('fa-user-circle') ? "Você" : "Product Manager GPT";
+            // Tentativa de ler o remetente pelo ícone
+            const isUser = msgElement.querySelector('.avatar-icon').classList.contains('fa-user-circle');
+            const remetente = isUser ? "Você" : "Product Manager GPT";
             const texto = msgElement.querySelector('.message-content').innerHTML; 
             const classe = msgElement.classList.contains('user-message') ? 'user-message' : 'pmgpt-message';
             const timestampElement = msgElement.querySelector('.timestamp');
-            const timestamp = timestampElement ? timestampElement.textContent : '00:00'; // Valor padrão para evitar erro
+            const timestamp = timestampElement ? timestampElement.textContent : '00:00'; 
 
             messages.push({ remetente, texto, classe, timestamp });
         }
@@ -203,7 +210,7 @@ function carregarHistorico() {
             
             // Icone
             const iconClass = msg.remetente === "Você" ? "fas fa-user-circle" : "fas fa-robot";
-            const avatar = `<i class="${iconClass} avatar-icon"></i>`;
+            const avatarHTML = `<i class="${iconClass} avatar-icon"></i>`;
             
             // Conteúdo
             const contentElement = document.createElement('div');
@@ -218,9 +225,9 @@ function carregarHistorico() {
             // Reconstroi a ordem correta
             if (msg.remetente === "Você") {
                 mensagemElement.appendChild(contentElement);
-                mensagemElement.appendChild(avatar);
+                contentElement.insertAdjacentHTML('afterend', avatarHTML);
             } else {
-                mensagemElement.appendChild(avatar);
+                contentElement.insertAdjacentHTML('beforebegin', avatarHTML);
                 mensagemElement.appendChild(contentElement);
             }
             mensagemElement.appendChild(timestamp);
