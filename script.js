@@ -1,4 +1,4 @@
-// script.js - VERSÃO FINAL (Limpeza por Comando e Correções)
+// script.js - VERSÃO FINAL (Limpeza por Comando, Correções, e EXPORTAÇÃO CSV)
 
 // Variável de controle para o estado de digitação
 let isTyping = false;
@@ -17,25 +17,35 @@ function limparHistorico(callback) {
     adicionarMensagemComDigitacao("Product Manager GPT", "Certo, eu limpei todo o histórico da conversa! Vamos começar de novo.", 'pmgpt-message', callback);
 }
 
-function salvarHistorico() {
+function carregarMensagensParaExportacao() {
     const messages = [];
     const chatMessagesDiv = document.getElementById('chatMessages');
     
+    // Percorre todos os elementos de mensagem (ignorando o indicador de digitação)
     Array.from(chatMessagesDiv.children).forEach(msgElement => {
         if (msgElement.classList.contains('chat-message')) {
             const iconElement = msgElement.querySelector('.avatar-icon');
-            if (!iconElement) return; 
+            if (!iconElement) return;
             
-            const isUser = iconElement.classList.contains('fa-user-circle');
-            const remetente = isUser ? "Você" : "Product Manager GPT";
-            const texto = msgElement.querySelector('.message-content').innerHTML; 
-            const classe = msgElement.classList.contains('user-message') ? 'user-message' : 'pmgpt-message';
+            const remetente = iconElement.classList.contains('fa-user-circle') ? "Você" : "Product Manager GPT";
+            
+            // Remove as tags HTML (como <strong>) para exportar apenas o texto puro
+            const texto = msgElement.querySelector('.message-content').textContent.trim(); 
+            
             const timestampElement = msgElement.querySelector('.timestamp');
             const timestamp = timestampElement ? timestampElement.textContent : '00:00'; 
 
-            messages.push({ remetente, texto, classe, timestamp });
+            messages.push({ remetente, texto, timestamp });
         }
     });
+    return messages;
+}
+
+function salvarHistorico() {
+    // Reutiliza a função de exportação para obter a lista completa
+    const messages = carregarMensagensParaExportacao();
+    
+    // Salva o histórico completo no localStorage
     localStorage.setItem('chatHistory', JSON.stringify(messages));
 }
 
@@ -47,14 +57,14 @@ function carregarHistorico() {
         
         messages.forEach(msg => {
             const mensagemElement = document.createElement('div');
-            mensagemElement.className = `chat-message ${msg.classe}`;
+            mensagemElement.className = `chat-message ${msg.remetente === "Você" ? 'user-message' : 'pmgpt-message'}`;
             
             const icon = document.createElement('i');
             icon.className = msg.remetente === "Você" ? "fas fa-user-circle avatar-icon" : "fas fa-robot avatar-icon";
             
             const contentElement = document.createElement('div');
             contentElement.className = 'message-content';
-            contentElement.innerHTML = msg.texto; 
+            contentElement.innerHTML = msg.texto; // Usa innerHTML para manter o negrito (se houver)
 
             const timestamp = document.createElement('span');
             timestamp.className = 'timestamp';
@@ -80,11 +90,48 @@ function carregarHistorico() {
     }
 }
 
+// --- Funções de Exportação CSV ---
 
-// --- Funções de Envio e Resposta ---
+function exportarHistoricoParaCSV() {
+    const messages = carregarMensagensParaExportacao();
+    
+    if (messages.length === 0) {
+        alert("Não há histórico para exportar.");
+        return;
+    }
+    
+    const csvContent = [];
+    // Cabeçalho do CSV
+    csvContent.push(["Remetente", "Horário", "Mensagem"].join(";")); 
+
+    // Conteúdo
+    messages.forEach(msg => {
+        // Remove quebras de linha e vírgulas do texto para não quebrar a formatação CSV
+        const cleanedText = msg.texto.replace(/(\r\n|\n|\r)/gm, " ").replace(/"/g, '""'); 
+        csvContent.push([`"${msg.remetente}"`, `"${msg.timestamp}"`, `"${cleanedText}"`].join(";"));
+    });
+
+    const csvString = csvContent.join("\n");
+
+    // Cria um blob (arquivo) e dispara o download
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    
+    // Define o nome do arquivo
+    link.setAttribute("href", url);
+    link.setAttribute("download", `pmgpt_historico_${new Date().toISOString().slice(0, 10)}.csv`);
+    
+    // Dispara o clique e a remoção
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+
+// --- Funções de Envio e Resposta (Inalteradas) ---
 
 function enviarMensagem() {
-    // 1. Bloqueia se a IA já estiver respondendo
     if (isTyping) return; 
 
     const perguntaInput = document.getElementById('perguntaInput');
@@ -92,30 +139,23 @@ function enviarMensagem() {
     const pergunta = perguntaInput.value.trim();
     const perguntaLower = pergunta.toLowerCase();
 
-    // 2. Verifica se é um comando de limpeza
     const isClearCommand = 
         (perguntaLower.includes('limpar') || perguntaLower.includes('limpe') || perguntaLower.includes('apagar') || perguntaLower.includes('apague')) && 
         (perguntaLower.includes('histórico') || perguntaLower.includes('conversa'));
 
     if (pergunta !== '') {
         
-        // --- FLUXO DE COMANDO DE LIMPEZA ---
         if (isClearCommand) {
             
-            // Desativa inputs e ativa isTyping
             isTyping = true;
             perguntaInput.disabled = true;
             sendButton.disabled = true;
             perguntaInput.value = '';
 
-            // Adiciona a mensagem do usuário
             adicionarMensagemComDigitacao("Você", pergunta, 'user-message', () => {
                 mostrarIndicadorDigitacao(true);
-                // Pequeno atraso para simular o processamento do comando
                 setTimeout(() => {
-                    // Limpa o histórico e responde
                     limparHistorico(() => {
-                        // Reativar o input e zerar o estado
                         mostrarIndicadorDigitacao(false);
                         perguntaInput.disabled = false;
                         sendButton.disabled = false;
@@ -124,43 +164,33 @@ function enviarMensagem() {
                     });
                 }, 500); 
             });
-            return; // Interrompe o fluxo normal
+            return; 
 
         }
         
-        // --- INÍCIO DO FLUXO NORMAL DE CONVERSA ---
-        
-        // 3. Define o estado de digitação e desativa inputs
         isTyping = true;
         perguntaInput.disabled = true;
         sendButton.disabled = true;
         
         const resposta = obterResposta(pergunta);
         
-        // 4. Adicionar e exibir a mensagem do usuário (com digitação)
         adicionarMensagemComDigitacao("Você", pergunta, 'user-message', () => {
             
             perguntaInput.value = '';
 
-            // 5. Ligar o indicador
             mostrarIndicadorDigitacao(true);
 
-            // 6. Simular um atraso MÍNIMO para a IA "pensar" (100ms)
             setTimeout(() => {
                 
-                // 7. Adicionar e exibir a resposta do PM GPT
                 adicionarMensagemComDigitacao("Product Manager GPT", resposta, 'pmgpt-message', () => {
                     
-                    // 8. Ocultar o indicador
                     mostrarIndicadorDigitacao(false);
                     
-                    // 9. Reativar o input, botão e zerar o estado
                     perguntaInput.disabled = false;
                     sendButton.disabled = false;
                     isTyping = false; 
                     perguntaInput.focus();
                     
-                    // 10. Salvar o novo estado da conversa
                     salvarHistorico();
                 });
             }, 100); 
