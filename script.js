@@ -4,8 +4,8 @@
 let isTyping = false;
 
 // Substitua o placeholder pela sua URL real do LinkedIn
-const LINKEDIN_URL = "SUA_URL_DO_LINKEDIN_AQUI"; 
-const LINKEDIN_TRIGGERS = ['linkedin', 'linkar perfil', 'quem é o pm', 'portfolio', 'currículo', 'me contrata'];
+const LINKEDIN_URL = "https://www.linkedin.com/in/hugomoraesapm/"; 
+const LINKEDIN_TRIGGERS = ['linkedin', 'linkar perfil', 'quem é o pm', 'portfolio', 'currículo', 'quem é o dono'];
 const COTACAO_TRIGGERS = ['cotação de hoje', 'me da um dado', 'o que é importante', 'o que importa', 'valor do dolar', 'cotação'];
 
 // --- Funções de Cotação Real (BACEN) e Simulação ---
@@ -176,7 +176,7 @@ function carregarHistorico() {
         chatMessages.scrollTop = chatMessages.scrollHeight;
     } else {
         setTimeout(() => {
-            adicionarMensagemComDigitacao("Product Manager GPT", "Bem-vindo, stakeholder! Pronto para ter suas perguntas respondidas com clareza e zero clichês? (Resposta: **Depende**).", 'pmgpt-message');
+            adicionarMensagemComDigitacao("Product Manager GPT", "Bem-vindo, stakeholder! Pronto para ter suas perguntas respondidas com clareza e zero clichês?", 'pmgpt-message');
         }, 100);
     }
 }
@@ -226,7 +226,7 @@ function abrirLinkedInEResponder(pergunta, callback) {
 }
 
 function exibirMensagemModoNoturnoEspecial() {
-    const mensagem = "Legal essa feature de modo noturno, não é? Fizemos isso depois de **11,5%** dos usuários implorarem por isso nas pesquisas de satisfação.";
+    const mensagem = "Legal essa feature de modo noturno, não é? Fizemos isso depois de **35%** dos usuários implorarem por isso nas pesquisas de satisfação.";
     
     adicionarMensagemComDigitacao("Product Manager GPT", mensagem, 'pmgpt-message', () => {
         // Nada precisa acontecer
