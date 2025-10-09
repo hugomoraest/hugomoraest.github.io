@@ -29,5 +29,25 @@
         </div>
     </div>
     <script src="script.js"></script>
+
+    <button id="openPanelButton" onclick="toggleSidePanel()">
+        <i class="fas fa-user-circle"></i>
+    </button>
+
+    <div id="sidePanel" class="side-panel">
+        <button class="close-btn" onclick="toggleSidePanel()">&times;</button>
+        <h2>Meus Contatos</h2>
+        <div class="contact-icons">
+            <a href="https://www.linkedin.com/in/hugomoraesapm/" target="_blank" title="LinkedIn">
+                <i class="fab fa-linkedin"></i>
+            </a>
+            <a href="https://wa.me/SEU_NUMERO_AQUI" target="_blank" title="WhatsApp">
+                <i class="fab fa-whatsapp-square"></i>
+            </a>
+        </div>
+        <button class="download-cv-btn" onclick="downloadCV()">
+            <i class="fas fa-download"></i> Baixar Currículo
+        </button>
+    </div>
 </body>
 </html>
