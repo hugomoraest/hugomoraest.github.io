@@ -5,7 +5,7 @@ let isTyping = false;
 
 // Substitua o placeholder pela sua URL real do LinkedIn
 const LINKEDIN_URL = "https://www.linkedin.com/in/hugomoraesapm/"; 
-const LINKEDIN_TRIGGERS = ['linkedin?', 'linkar perfil', 'quem é o pm', 'quem é você', 'currículo', 'quem é o dono'];
+const LINKEDIN_TRIGGERS = ['linkedin?', 'linkar perfil', 'quem é o pm', 'quem é você', 'quem e o dono','quem e você', 'currículo', 'quem é o dono'];
 const COTACAO_TRIGGERS = ['cotação de hoje', 'me da um dado', 'o que é importante', 'o que importa', 'valor do dolar', 'cotação'];
 
 // --- Funções de Cotação Real (BACEN) e Simulação ---
