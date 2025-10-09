@@ -1,4 +1,4 @@
-// script.js - VERSÃO FINAL E CORRIGIDA
+// script.js - VERSÃO FINAL E TOTALMENTE REVISADA
 
 // Variável de controle para o estado de digitação
 let isTyping = false;
@@ -46,7 +46,7 @@ function enviarMensagem() {
                     perguntaInput.disabled = false;
                     sendButton.disabled = false;
                     isTyping = false; 
-                    perguntaInput.focus(); // Coloca o foco de volta
+                    perguntaInput.focus();
                     
                     // 9. Salvar o novo estado da conversa
                     salvarHistorico();
@@ -54,7 +54,7 @@ function enviarMensagem() {
             }, 1000); 
         });
     } else {
-        // Se a pergunta estiver vazia, garante que o input esteja ativo e isTyping seja false.
+        // Se a pergunta estiver vazia
         perguntaInput.disabled = false;
         sendButton.disabled = false;
         isTyping = false;
@@ -90,7 +90,7 @@ function obterResposta(pergunta) {
         "Nossos objetivos são tão claros que até os astrólogos concordam. O universo está alinhado, e nosso produto também."
     ];
 
-    // --- Feature: Respostas Específicas por Palavra-Chave (Easter Egg) ---
+    // --- Respostas Específicas por Palavra-Chave (Easter Egg) ---
     const perguntaLower = pergunta.toLowerCase();
     if (perguntaLower.includes('roadmap')) {
         return "O roadmap? Está no mesmo lugar que o dinheiro que a gente economizou cortando o café. Ou seja, 'em desenvolvimento', mas ninguém sabe onde.";
@@ -103,8 +103,6 @@ function obterResposta(pergunta) {
     return respostas[indiceResposta];
 }
 
-
-// script.js - FUNÇÃO CORRIGIDA PARA GARANTIR O CALLBACK
 
 function adicionarMensagemComDigitacao(remetente, resposta, classe, callback = () => {}) {
     const chatMessages = document.getElementById('chatMessages');
@@ -133,23 +131,21 @@ function adicionarMensagemComDigitacao(remetente, resposta, classe, callback = (
 
     let index = 0;
     
-    // Remove qualquer tag HTML para garantir que o contador (index) e o texto sejam simples
+    // CORREÇÃO: Remove qualquer tag HTML para garantir que o contador e o texto sejam simples
     const textoPuro = resposta.replace(/<[^>]*>/g, ''); 
     const textoCompletoHTML = resposta;
 
     function exibirProximoCaractere() {
         if (index < textoPuro.length) {
             
-            // Exibe APENAS o texto puro com o efeito de digitação
+            // Durante a digitação, usa apenas o texto puro
             contentElement.textContent = textoPuro.substring(0, index + 1);
             index++;
             
             const delay = remetente === "Product Manager GPT" ? 35 : 15; 
             setTimeout(exibirProximoCaractere, delay);
         } else {
-            // Fim da digitação
-            
-            // Restaura o texto original COM A FORMATAÇÃO HTML para que o negrito apareça
+            // Fim da digitação: restaura o HTML para a formatação (negrito)
             contentElement.innerHTML = textoCompletoHTML; 
             
             // Adiciona o carimbo de data/hora
@@ -159,29 +155,35 @@ function adicionarMensagemComDigitacao(remetente, resposta, classe, callback = (
             mensagemElement.appendChild(timestamp);
 
             chatMessages.scrollTop = chatMessages.scrollHeight;
-            // ESSA LINHA AQUI É A CHAVE: ela deve executar e permitir a resposta do GPT!
-            callback(); 
+            callback(); // CHAMA O CALLBACK E PROSSEGUE PARA O PRÓXIMO PASSO DO FLUXO
         }
     }
 
     exibirProximoCaractere();
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
+
+function mostrarIndicadorDigitacao(show) {
+    const indicator = document.getElementById('typingIndicator');
+    indicator.style.display = show ? 'flex' : 'none';
+    const chatMessages = document.getElementById('chatMessages');
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+
 // --- Funções de Histórico e Inicialização ---
 
 function salvarHistorico() {
     const messages = [];
     const chatMessagesDiv = document.getElementById('chatMessages');
     
-    // Percorre todos os elementos de mensagem (ignorando o indicador de digitação)
     Array.from(chatMessagesDiv.children).forEach(msgElement => {
         if (msgElement.classList.contains('chat-message')) {
             const remetente = msgElement.querySelector('.avatar-icon').classList.contains('fa-user-circle') ? "Você" : "Product Manager GPT";
             const texto = msgElement.querySelector('.message-content').innerHTML; 
             const classe = msgElement.classList.contains('user-message') ? 'user-message' : 'pmgpt-message';
-            // Verifica se o timestamp existe antes de tentar ler
             const timestampElement = msgElement.querySelector('.timestamp');
-            const timestamp = timestampElement ? timestampElement.textContent : new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            const timestamp = timestampElement ? timestampElement.textContent : '00:00'; // Valor padrão para evitar erro
 
             messages.push({ remetente, texto, classe, timestamp });
         }
@@ -239,7 +241,6 @@ function carregarHistorico() {
 function alternarModoNoturno() {
     const body = document.body;
     body.classList.toggle('dark-mode');
-    // Salva a preferência
     if (body.classList.contains('dark-mode')) {
         localStorage.setItem('darkMode', 'enabled');
     } else {
@@ -249,10 +250,8 @@ function alternarModoNoturno() {
 
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Carrega o histórico (se existir)
     carregarHistorico();
     
-    // 2. Inicializa o Modo Noturno
     const body = document.body;
     const toggleButton = document.getElementById('toggleNightMode');
     if (localStorage.getItem('darkMode') === 'enabled') {
@@ -260,6 +259,5 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     toggleButton.onclick = alternarModoNoturno;
     
-    // Coloca o foco no input
     document.getElementById('perguntaInput').focus();
 });
