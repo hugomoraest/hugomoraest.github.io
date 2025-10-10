@@ -73,30 +73,30 @@ function stopCostTrackingAndAlert() {
 
 /**
  * Calcula e posiciona o card de custo ao lado do chat container.
+ * Usa getBoundingClientRect para obter a posição real do chat na tela.
  */
 function updateCostTrackerPosition() {
     const chatContainer = document.querySelector('.chat-container');
     const costTracker = document.getElementById('costTracker');
 
     if (chatContainer && costTracker) {
-        // Obtém a posição e dimensões do chat container
         const rect = chatContainer.getBoundingClientRect();
         
-        // 10px de espaçamento entre o chat container e o card
+        // Espaçamento de 15px entre o chat e o card
         const offset = 15; 
         
         // Define a posição TOP (alinhada com o topo do chat container)
         const topPosition = rect.top;
         
-        // Define a posição LEFT (à direita do chat container)
+        // Define a posição LEFT (à direita do chat container: Borda Direita do Chat + Offset)
         const leftPosition = rect.right + offset;
         
         // Aplica o posicionamento
         costTracker.style.position = 'fixed';
         costTracker.style.top = `${topPosition}px`;
         costTracker.style.left = `${leftPosition}px`;
-        
-        // Regra para telas muito pequenas
+
+        // Se a tela for muito estreita, esconde o card
         if (window.innerWidth < 700) {
             costTracker.style.display = 'none';
         } else {
