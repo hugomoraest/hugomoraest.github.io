@@ -131,7 +131,7 @@ body.dark-mode {
 }
 
 #currentCost {
-    color: #4CAF50; 
+    color: #FF0000; 
     font-size: 16px; 
     font-weight: 800;
     line-height: 1; /* Garante que a linha de valor seja compacta */
