@@ -13,10 +13,6 @@
             <h1><i class="fas fa-robot"></i> Product Manager GPT</h1>
             <div class="subtitle">Para stakeholders</div>
             
-            <div id="costTracker" class="cost-tracker">
-                Custo Total (Tempo): <span id="currentCost">R$ 0,00</span>
-            </div>
-            
             <button id="exportButton" onclick="exportarHistoricoParaCSV()" title="Exportar conversas para CSV"><i class="fas fa-download"></i> Exportar</button>
             
             <button id="toggleNightMode" onclick="alternarModoNoturno()">Modo Noturno</button>
@@ -33,6 +29,10 @@
         </div>
     </div>
     <script src="script.js"></script>
+
+    <div id="costTracker" class="cost-tracker">
+        Custo Total (Tempo): <span id="currentCost">R$ 0,00</span>
+    </div>
 
     <button id="openPanelButton" onclick="toggleSidePanel()">
         <i class="fas fa-user-circle"></i>
