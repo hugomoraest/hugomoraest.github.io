@@ -50,8 +50,7 @@ body.dark-mode {
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
     position: relative;
-    /* Aumenta o padding inferior para criar espaço para 3 elementos no canto */
-    padding-bottom: 70px; 
+    padding-bottom: 15px; 
 }
 
 .chat-header h1 {
@@ -74,32 +73,38 @@ body.dark-mode {
     cursor: pointer;
     font-size: 12px;
     transition: background-color 0.3s;
+    top: 15px; 
 }
 
-/* Botão Modo Noturno: Posição TOP (Mais alto) */
 #toggleNightMode {
-    top: 15px;
     right: 15px;
 }
 
-/* Botão Exportar: Posição ABAIXO do Modo Noturno, alinhado à direita */
 #exportButton {
-    top: 50px; /* Movido para baixo */
-    right: 15px;
+    right: 90px;
 }
 
 #toggleNightMode:hover, #exportButton:hover {
     background-color: rgba(255, 255, 255, 0.3);
 }
 
-/* --- Estilo para o Contador de Custo (Posicionamento Externo) --- */
+/* --- NOVO: Estilo para o Contador de Custo (Formato Quadrado) --- */
 .cost-tracker {
     position: fixed; 
-    padding: 8px 15px;
+    
+    /* DEFINIÇÃO DO FORMATO QUADRADO E ALINHAMENTO */
+    width: 100px;
+    height: 100px;
+    display: flex;
+    flex-direction: column; /* Alinha o conteúdo verticalmente */
+    justify-content: space-between; /* Espaçamento entre nome e valor */
+    align-items: center; /* Centraliza o conteúdo horizontalmente */
+    
+    padding: 10px; /* Padding ajustado para o tamanho */
     background-color: #fff;
     color: #0077cc;
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 11px; /* Fonte menor para caber */
     font-weight: bold;
     text-align: center;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -115,6 +120,8 @@ body.dark-mode {
 
 #currentCost {
     color: #4CAF50; 
+    font-size: 16px; /* Destaca o valor */
+    margin-top: 5px;
 }
 
 .dark-mode #currentCost {
