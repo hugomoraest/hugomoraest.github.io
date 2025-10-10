@@ -1,18 +1,19 @@
-// script.js - VERSÃO FINAL E COMPLETA COM TODAS AS FEATURES
+// script.js - VERSÃO FINAL COM POSICIONAMENTO DINÂMICO DE CUSTO
 
 // Variável de controle para o estado de digitação
 let isTyping = false;
 
-// --- DADOS DE CONFIGURAÇÃO DO PM ---
-
-// Constantes para Cálculo de Custo
+// --- DADOS DE CONFIGURAÇÃO E CÁLCULO DE CUSTO ---
 const MONTHLY_SALARY = 10000;
 const WORK_DAYS_PER_MONTH = 22;
 const WORK_HOURS_PER_DAY = 8;
 const SECONDS_PER_HOUR = 3600;
+
+// Custo por segundo (R$ 10.000 / (22 * 8 * 3600) )
 const COST_PER_SECOND = MONTHLY_SALARY / (WORK_DAYS_PER_MONTH * WORK_HOURS_PER_DAY * SECONDS_PER_HOUR); 
+
 let totalSecondsSpent = 0;
-let costIntervalId = null;
+let costIntervalId = null; 
 
 // URLs Externas e Triggers
 const LINKEDIN_URL = "https://www.linkedin.com/in/hugomoraesapm/"; 
@@ -21,7 +22,6 @@ const COMIC_MEDIA_URLS = [
     "https://media.tenor.com/0qfA3q9QEYkAAAAj/oiia-cat-cat.gif", 
     "https://media.tenor.com/DXB8gY7CgQwAAAAM/meme-monday.gif", 
     "https://media.tenor.com/j5rPRPBwSOMAAAAM/cat-smacking-other-cat-cat.gif", 
-    
 ];
 
 // <<<<<<< LOCAL PARA INSERIR O CÓDIGO BASE64 DO CURRÍCULO >>>>>>>
@@ -32,11 +32,8 @@ const LINKEDIN_TRIGGERS = ['linkedin', 'linkar perfil', 'quem é o pm', 'portfol
 const COTACAO_TRIGGERS = ['cotação de hoje', 'me da um dado', 'o que é importante', 'o que importa', 'valor do dolar', 'cotação', 'ipca', 'inflação'];
 
 
-// --- Funções de Utilitários e Estado ---
+// --- Funções de Controle de Custo ---
 
-/**
- * Funções para Controle do Custo do Tempo
- */
 function updateCostDisplay() {
     const costElement = document.getElementById('currentCost');
     if (costElement) {
@@ -49,20 +46,17 @@ function updateCostDisplay() {
 }
 
 function startCostTracking() {
-    // Inicia o contador de custo a cada segundo
     if (!costIntervalId) {
         costIntervalId = setInterval(updateCostDisplay, 1000);
     }
 }
 
 function stopCostTrackingAndAlert() {
-    // Para o contador
     if (costIntervalId) {
         clearInterval(costIntervalId);
         costIntervalId = null;
     }
 
-    // Dispara o alerta de saída cômico
     if (totalSecondsSpent > 0) {
         const totalCost = totalSecondsSpent * COST_PER_SECOND;
         const formattedTime = totalSecondsSpent > 60 
@@ -73,14 +67,47 @@ function stopCostTrackingAndAlert() {
 
         const alertMessage = `Você ficou ${formattedTime} falando comigo e isso custou à empresa R$ ${formattedCost}, que foi melhor investido aqui do que naquela reunião que não levou a lugar nenhum.`;
         
-        // Exibe o alerta
         alert(alertMessage);
     }
 }
 
 /**
- * Funções do Painel Lateral e Download CV
+ * Calcula e posiciona o card de custo ao lado do chat container.
  */
+function updateCostTrackerPosition() {
+    const chatContainer = document.querySelector('.chat-container');
+    const costTracker = document.getElementById('costTracker');
+
+    if (chatContainer && costTracker) {
+        // Obtém a posição e dimensões do chat container
+        const rect = chatContainer.getBoundingClientRect();
+        
+        // 10px de espaçamento entre o chat container e o card
+        const offset = 15; 
+        
+        // Define a posição TOP (alinhada com o topo do chat container)
+        const topPosition = rect.top;
+        
+        // Define a posição LEFT (à direita do chat container)
+        const leftPosition = rect.right + offset;
+        
+        // Aplica o posicionamento
+        costTracker.style.position = 'fixed';
+        costTracker.style.top = `${topPosition}px`;
+        costTracker.style.left = `${leftPosition}px`;
+        
+        // Regra para telas muito pequenas
+        if (window.innerWidth < 700) {
+            costTracker.style.display = 'none';
+        } else {
+            costTracker.style.display = 'block';
+        }
+    }
+}
+
+
+// --- Funções do Painel Lateral e Download ---
+
 function toggleSidePanel() {
     const panel = document.getElementById('sidePanel');
     panel.classList.toggle('open');
@@ -94,58 +121,13 @@ function downloadCV() {
     
     const link = document.createElement('a');
     link.href = CV_BASE64_DATA;
-    link.setAttribute('download', 'Curriculo_HugoMoraes_PM.pdf');
+    link.setAttribute('download', 'Curriculo_HugoMoraes_PM.pdf'); 
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
 
     alert("Download do Currículo iniciado!");
 }
-
-/**
- * Funções de Mídia
- */
-function abrirLinkMidia(callback) {
-    window.open(MIDIA_URL, '_blank');
-    const resposta = "Sim! Nossas estratégias são tão inovadoras que **saímos na mídia**. O artigo completo está em uma nova aba. Não se preocupe, voltarei para ignorar sua pergunta em breve!";
-    adicionarMensagemComDigitacao("Product Manager GPT", resposta, 'pmgpt-message', callback);
-}
-
-function getGatoMediaUrl() {
-    if (COMIC_MEDIA_URLS.length === 0) return null;
-    const randomIndex = Math.floor(Math.random() * COMIC_MEDIA_URLS.length);
-    return COMIC_MEDIA_URLS[randomIndex];
-}
-
-function exibirMensagemModoNoturnoEspecial() {
-    const mensagem = "Legal essa feature de modo noturno, não é? Fizemos isso depois de **35%** dos usuários implorarem por isso nas pesquisas de satisfação.";
-    adicionarMensagemComDigitacao("Product Manager GPT", mensagem, 'pmgpt-message', () => {
-        // Nada precisa acontecer
-    });
-}
-
-function alternarModoNoturno() {
-    const body = document.body;
-    body.classList.toggle('dark-mode');
-    
-    let nightModeToggleCount = localStorage.getItem('nightModeToggleCount') || 0;
-    const messageShown = localStorage.getItem('nightModeMessageShown') === 'true'; 
-    
-    nightModeToggleCount = parseInt(nightModeToggleCount) + 1;
-    localStorage.setItem('nightModeToggleCount', nightModeToggleCount);
-
-    if (body.classList.contains('dark-mode')) {
-        localStorage.setItem('darkMode', 'enabled');
-    } else {
-        localStorage.setItem('darkMode', 'disabled');
-    }
-    
-    if (nightModeToggleCount === 2 && !messageShown) {
-        setTimeout(exibirMensagemModoNoturnoEspecial, 1000); 
-        localStorage.setItem('nightModeMessageShown', 'true');
-    }
-}
-
 
 // --- Funções de Cotação Real (BACEN/IBGE) e Simulação ---
 
@@ -392,10 +374,8 @@ function abrirLinkMidia(callback) {
     // 1. Abre o link em uma nova aba
     window.open(MIDIA_URL, '_blank');
     
-    // 2. Resposta de confirmação
     const resposta = "Sim! Nossas estratégias são tão inovadoras que **saímos na mídia**. O artigo completo está em uma nova aba. Não se preocupe, voltarei para ignorar sua pergunta em breve!";
     
-    // 3. Adiciona a resposta no chat e chama o callback para reativar o input
     adicionarMensagemComDigitacao("Product Manager GPT", resposta, 'pmgpt-message', callback);
 }
 
@@ -527,7 +507,7 @@ async function enviarMensagem() {
             return; 
         }
         
-        // --- INÍCIO DO FLUXO NORMAL DE CONVERSA ---
+        // INÍCIO DO FLUXO NORMAL DE CONVERSA (com chance de Easter Egg Mídia)
         
         isTyping = true;
         perguntaInput.disabled = true;
@@ -710,20 +690,24 @@ function mostrarIndicadorDigitacao(show) {
 
 document.addEventListener('DOMContentLoaded', () => {
     carregarHistorico();
-    startCostTracking(); // Inicia o rastreamento do custo ao carregar a página
+    startCostTracking(); 
+    updateCostTrackerPosition(); // Posiciona o card na inicialização
     
+    // Adiciona listeners para garantir o reposicionamento do card em redimensionamento
+    window.addEventListener('resize', updateCostTrackerPosition); 
+
     // Adiciona listener para o gatilho de saída (mudança de aba/janela)
     document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'hidden') {
             stopCostTrackingAndAlert();
         } else {
-            // Reinicia o rastreamento se o usuário voltar
             startCostTracking();
         }
     });
 
     // Adiciona listener para mouse saindo da janela (tentativa de fechar/mudar o foco)
     document.addEventListener('mouseleave', (event) => {
+        // Dispara se o mouse sair da borda superior ou lateral da janela
         if (event.clientY <= 0 || event.clientX <= 0 || event.clientX >= window.innerWidth || event.clientY >= window.innerHeight) {
             stopCostTrackingAndAlert();
         }
