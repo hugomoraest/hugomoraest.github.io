@@ -12,11 +12,7 @@ const MIDIA_URL = "https://www.linkedin.com/feed/update/urn:li:activity:71484273
 // URLs de Mídia Cômica para Resposta Aleatória (Simulando API de Gifs)
 const COMIC_MEDIA_URLS = [
     "https://imgur.com/gallery/rare-turtle-gato-migrates-pSeELHt#/t/gato", // GIF de gato 1
-    "https://i.imgur.com/K7r7u4C.gif", // GIF de cachorro (alternativa)
-    "https://i.imgur.com/4gC8lQG.gif", // GIF engraçado 
-    "https://i.imgur.com/393Jq1x.gif", // GIF 
-    "https://i.imgur.com/S864N08.gif", // GIF de gato 2
-    "https://i.imgur.com/393Jq1x.gif", // GIF
+  
 ];
 
 // <<<<<<< LOCAL PARA INSERIR O CÓDIGO BASE64 DO CURRÍCULO >>>>>>>
