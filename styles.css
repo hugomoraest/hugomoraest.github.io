@@ -120,7 +120,7 @@ body.dark-mode {
 
 .dark-mode .cost-tracker {
     background-color: #444;
-    color: #f7f7f7;
+    color: #FF0000;
     box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
 }
 
