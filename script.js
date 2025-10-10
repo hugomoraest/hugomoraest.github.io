@@ -422,13 +422,13 @@ async function enviarMensagem() {
             return; 
         }
         
-       // --- INÍCIO DO FLUXO NORMAL DE CONVERSA ---
+        // --- INÍCIO DO FLUXO NORMAL DE CONVERSA (com chance de Easter Egg Mídia)
         
         isTyping = true;
         perguntaInput.disabled = true;
         sendButton.disabled = true;
         
-        // 4. Lógica da Mídia de Marketing (1 em 15 chances - Mantida)
+        // 4. Lógica da Mídia (1 em 15 chances)
         const mediaChance = Math.random();
         if (mediaChance < 0.065) { 
              adicionarMensagemComDigitacao("Você", pergunta, 'user-message', () => {
@@ -448,7 +448,7 @@ async function enviarMensagem() {
             return;
         }
 
-        // 5. Lógica do Gato Aleatório (NOVA FEATURE: 1 em 10 chances)
+        // 5. Lógica do Gato Aleatório (1 em 10 chances)
         const gatoChance = Math.random();
         if (gatoChance < 0.10) { 
             const mediaUrl = getGatoMediaUrl();
@@ -464,58 +464,6 @@ async function enviarMensagem() {
                         perguntaInput.disabled = false;
                         sendButton.disabled = false;
                         isTyping = false; 
-                        perguntaInput.focus();
-                        salvarHistorico();
-                    });
-                }, 500); // Dá um tempo maior para carregar o GIF
-            });
-            return;
-        }
-
-
-        // Resposta padrão (se nenhum easter egg for acionado)
-        const resposta = obterResposta(pergunta);
-        
-        adicionarMensagemComDigitacao("Você", pergunta, 'user-message', () => {
-            
-            perguntaInput.value = '';
-
-            mostrarIndicadorDigitacao(true);
-
-            setTimeout(() => {
-                
-                adicionarMensagemComDigitacao("Product Manager GPT", resposta, 'pmgpt-message', () => {
-                    
-                    mostrarIndicadorDigitacao(false);
-                    
-                    perguntaInput.disabled = false;
-                    sendButton.disabled = false;
-                    isTyping = false; 
-                    perguntaInput.focus();
-                    
-                    salvarHistorico();
-                });
-            }, 100); 
-        });
-    } else {
-        perguntaInput.disabled = false;
-        sendButton.disabled = false;
-        isTyping = false;
-    }
-}
-        
-        // 4. Lógica da Mídia (1 em 15 chances)
-        const mediaChance = Math.random();
-        if (mediaChance < 0.065) { 
-             adicionarMensagemComDigitacao("Você", pergunta, 'user-message', () => {
-                mostrarIndicadorDigitacao(true);
-                setTimeout(() => {
-                    abrirLinkMidia(() => {
-                        mostrarIndicadorDigitacao(false);
-                        perguntaInput.disabled = false;
-                        sendButton.disabled = false;
-                        isTyping = false; 
-                        perguntaInput.value = '';
                         perguntaInput.focus();
                         salvarHistorico();
                     });
