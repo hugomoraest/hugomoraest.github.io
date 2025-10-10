@@ -50,7 +50,8 @@ body.dark-mode {
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
     position: relative;
-    padding-bottom: 15px; 
+    /* Aumenta o padding inferior para criar espaço para o card de custo externo e 2 botões */
+    padding-bottom: 70px; 
 }
 
 .chat-header h1 {
@@ -73,44 +74,46 @@ body.dark-mode {
     cursor: pointer;
     font-size: 12px;
     transition: background-color 0.3s;
-    top: 15px; 
-}
-
-#toggleNightMode {
+    /* Alinha os botões à direita */
     right: 15px;
 }
 
+/* Botão Modo Noturno: Posição SUPERIOR */
+#toggleNightMode {
+    top: 15px;
+}
+
+/* Botão Exportar: Posição INFERIOR, alinhado à direita */
 #exportButton {
-    right: 90px;
+    top: 50px; /* Movido para baixo para ficar abaixo do Modo Noturno */
 }
 
 #toggleNightMode:hover, #exportButton:hover {
     background-color: rgba(255, 255, 255, 0.3);
 }
 
-/* --- NOVO: Estilo para o Contador de Custo (Formato Quadrado) --- */
+/* --- Estilo para o Contador de Custo (Posicionamento Externo) --- */
 .cost-tracker {
     position: fixed; 
-    
-    /* DEFINIÇÃO DO FORMATO QUADRADO E ALINHAMENTO */
-    width: 100px;
-    height: 100px;
-    display: flex;
-    flex-direction: column; /* Alinha o conteúdo verticalmente */
-    /* Garante que o conteúdo (título e valor) ocupem o espaço corretamente */
-    justify-content: space-between; 
-    align-items: center; /* Centraliza o conteúdo horizontalmente */
-    
-    padding: 10px; 
+    padding: 8px 15px;
     background-color: #fff;
     color: #0077cc;
     border-radius: 8px;
-    font-size: 11px;
+    font-size: 11px; /* Fonte menor para caber */
     font-weight: bold;
     text-align: center;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     z-index: 998;
     margin: 0; 
+
+    /* DEFINIÇÃO DO FORMATO QUADRADO E ALINHAMENTO */
+    width: 100px;
+    height: 100px;
+    display: flex;
+    flex-direction: column; /* Alinha o conteúdo verticalmente */
+    justify-content: space-between; /* Espaçamento entre nome e valor */
+    align-items: center; /* Centraliza o conteúdo horizontalmente */
+    padding: 10px; 
 }
 
 .dark-mode .cost-tracker {
@@ -121,8 +124,8 @@ body.dark-mode {
 
 #currentCost {
     color: #4CAF50; 
-    font-size: 16px; /* Destaca o valor */
-    font-weight: 800; /* Mais negrito para o valor */
+    font-size: 16px; 
+    font-weight: 800;
 }
 
 .dark-mode #currentCost {
