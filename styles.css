@@ -50,6 +50,8 @@ body.dark-mode {
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
     position: relative;
+    /* Ajuste o padding para acomodar o card de custo */
+    padding-bottom: 70px; 
 }
 
 .chat-header h1 {
@@ -72,21 +74,49 @@ body.dark-mode {
     cursor: pointer;
     font-size: 12px;
     transition: background-color 0.3s;
-}
-
-#toggleNightMode {
-    top: 15px;
-    right: 15px;
+    /* Alinha ao topo do header */
+    top: 15px; 
 }
 
 #exportButton {
-    top: 45px; /* Posição abaixo do Modo Noturno */
-    right: 15px;
+    top: 15px; 
+    right: 90px; /* Posiciona ao lado do Modo Noturno */
 }
 
 #toggleNightMode:hover, #exportButton:hover {
     background-color: rgba(255, 255, 255, 0.3);
 }
+
+/* --- NOVO: Estilo para o Contador de Custo --- */
+.cost-tracker {
+    position: absolute; /* Posição absoluta para não interferir no fluxo normal do header */
+    bottom: 10px;
+    left: 15px;
+    right: 15px;
+    padding: 8px;
+    background-color: #fff;
+    color: #0077cc;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.dark-mode .cost-tracker {
+    background-color: #444;
+    color: #f7f7f7;
+}
+
+#currentCost {
+    color: #4CAF50; /* Cor verde para destaque do valor */
+}
+
+.dark-mode #currentCost {
+    color: #25D366; 
+}
+/* --- FIM DO NOVO ESTILO --- */
+
 
 .chat-messages {
     flex: 1;
@@ -251,7 +281,7 @@ body.dark-mode {
   40% { transform: scale(1.0); }
 }
 
-/* --- NOVO: Estilos do Painel Lateral (Side Panel) --- */
+/* --- Estilos do Painel Lateral (Side Panel) --- */
 
 /* Botão Flutuante */
 #openPanelButton {
@@ -280,7 +310,6 @@ body.dark-mode {
     position: fixed;
     top: 0;
     right: 0;
-    /* REDUÇÃO DE LARGURA */
     width: 200px;
     max-width: 80vw;
     height: 100%;
@@ -308,7 +337,7 @@ body.dark-mode {
     border-bottom: 1px solid #ccc;
     padding-bottom: 10px;
     text-align: center;
-    font-size: 16px; /* Ajuste o tamanho do título */
+    font-size: 16px;
 }
 
 .dark-mode .side-panel h2 {
