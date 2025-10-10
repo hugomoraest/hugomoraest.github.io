@@ -90,7 +90,7 @@ body.dark-mode {
 
 /* --- NOVO: Estilo para o Contador de Custo (Posicionamento Externo) --- */
 .cost-tracker {
-    /* Define o posicionamento FIXO, mas o JS irá definir TOP e LEFT. */
+    /* Define o posicionamento FIXO, mas o JS irá definir TOP e LEFT para alinhamento */
     position: fixed; 
     
     /* Estilos de aparência */
@@ -104,7 +104,6 @@ body.dark-mode {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     z-index: 998;
     
-    /* Garante que ele não ocupe espaço na centralização do chat (importante) */
     margin: 0; 
 }
 
