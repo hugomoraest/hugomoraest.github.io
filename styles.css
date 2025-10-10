@@ -50,7 +50,8 @@ body.dark-mode {
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
     position: relative;
-    padding-bottom: 15px; 
+    /* Aumenta o padding inferior para criar espaço para 3 elementos no canto */
+    padding-bottom: 70px; 
 }
 
 .chat-header h1 {
@@ -73,27 +74,27 @@ body.dark-mode {
     cursor: pointer;
     font-size: 12px;
     transition: background-color 0.3s;
-    top: 15px; 
 }
 
+/* Botão Modo Noturno: Posição TOP (Mais alto) */
 #toggleNightMode {
+    top: 15px;
     right: 15px;
 }
 
+/* Botão Exportar: Posição ABAIXO do Modo Noturno, alinhado à direita */
 #exportButton {
-    right: 90px;
+    top: 50px; /* Movido para baixo */
+    right: 15px;
 }
 
 #toggleNightMode:hover, #exportButton:hover {
     background-color: rgba(255, 255, 255, 0.3);
 }
 
-/* --- NOVO: Estilo para o Contador de Custo (Posicionamento Externo) --- */
+/* --- Estilo para o Contador de Custo (Posicionamento Externo) --- */
 .cost-tracker {
-    /* Define o posicionamento FIXO, mas o JS irá definir TOP e LEFT para alinhamento */
     position: fixed; 
-    
-    /* Estilos de aparência */
     padding: 8px 15px;
     background-color: #fff;
     color: #0077cc;
@@ -103,7 +104,6 @@ body.dark-mode {
     text-align: center;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     z-index: 998;
-    
     margin: 0; 
 }
 
