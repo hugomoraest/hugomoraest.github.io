@@ -1,4 +1,4 @@
-/* styles.css */
+/* styles.css - CÓDIGO FINAL E CORRIGIDO */
 
 body {
     font-family: 'Arial', sans-serif;
@@ -7,12 +7,12 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background-color: #f7f7f7; /* Cor de fundo "Dia" */
+    background-color: #f7f7f7;
     transition: background-color 1.3s ease, color 1.3s ease; 
 }
 
 body.dark-mode {
-    background-color: #2c2c2c; /* Cor de fundo "Noite" (quase preto) */
+    background-color: #2c2c2c;
     color: #fff;
 }
 
@@ -23,11 +23,11 @@ body.dark-mode {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     display: flex;
     flex-direction: column;
-    /* Reduz a altura máxima para garantir que o iframe fixo não cubra o input */
+    /* Reduz a altura máxima para garantir espaço acima do iframe fixo */
     max-height: calc(90vh - 80px); 
     background-color: #fff;
     transition: background-color 1.3s ease, box-shadow 0.3s ease; 
-    transition-delay: 0.3s; /* Espera 0.3s antes de mudar */
+    transition-delay: 0.3s;
     animation: fadeIn 0.5s ease-out;
 }
 
@@ -95,11 +95,10 @@ body.dark-mode {
     overflow-y: auto;
 }
 
-/* --- CORREÇÃO DE ALINHAMENTO LADO A LADO --- */
+/* CORREÇÃO DE ALINHAMENTO LADO A LADO */
 .chat-input {
-    /* ATIVA O FLEXBOX */
     display: flex; 
-    align-items: center; /* Centraliza verticalmente input e botão */
+    align-items: center; 
     padding: 10px;
     border-top: 1px solid #ddd;
     border-bottom-left-radius: 8px;
@@ -114,7 +113,6 @@ body.dark-mode {
 }
 
 #perguntaInput {
-    /* Ocupa o máximo de espaço possível */
     flex-grow: 1; 
     height: 40px;
     padding: 0 10px;
@@ -122,7 +120,7 @@ body.dark-mode {
     border: 1px solid #ccc;
     outline: none;
     border-radius: 20px;
-    margin-right: 8px; /* Espaço entre o input e o botão */
+    margin-right: 8px; 
     transition: border-color 0.3s, background-color 1.3s ease, color 1.3s ease; 
     transition-delay: 0.3s;
 }
@@ -138,7 +136,6 @@ body.dark-mode {
 }
 
 #sendButton {
-    /* Botão agora é um círculo de tamanho fixo */
     width: 40px;
     height: 40px;
     background-color: #0077cc;
@@ -148,7 +145,6 @@ body.dark-mode {
     cursor: pointer;
     font-size: 16px;
     transition: background-color 0.3s;
-    /* Reduz o impacto no flex-grow */
     flex-shrink: 0; 
 }
 
@@ -160,14 +156,11 @@ body.dark-mode {
     background-color: #999;
     cursor: not-allowed;
 }
-/* --- FIM DA CORREÇÃO DE ALINHAMENTO --- */
-
 
 /* --- Estilo para o Contador de Custo (Posicionamento Externo) --- */
 .cost-tracker {
     position: fixed; 
     width: auto;
-    height: auto;
     min-width: 100px; 
     display: flex;
     flex-direction: column; 
@@ -207,11 +200,15 @@ body.dark-mode {
 .dark-mode #currentCost {
     color: #25D366; 
 }
-/* --- FIM DO NOVO ESTILO --- */
 
 
+/* --- ESTILO DE MENSAGENS E PAINEL LATERAL (MANTIDOS) --- */
 .chat-message {
     margin-bottom: 12px;
+    display: flex;
+    align-items: flex-end;
+    transition: color 1.3s ease; 
+    transition-delay: 0.3s;
 }
 
 .message-content {
@@ -225,7 +222,6 @@ body.dark-mode {
     transition-delay: 0.3s;
 }
 
-/* Garante que o texto do usuário seja preto no modo noturno */
 .dark-mode .user-message .message-content {
     color: #000;
 }
@@ -244,13 +240,6 @@ body.dark-mode {
 
 .dark-mode .pmgpt-message .message-content {
     background-color: #444;
-}
-
-.timestamp {
-    font-size: 10px;
-    color: #999;
-    margin: 0 5px;
-    align-self: flex-end;
 }
 
 .avatar-icon {
@@ -274,7 +263,6 @@ body.dark-mode {
     order: 1;
 }
 
-/* --- Indicador de Digitação (Typing Indicator) --- */
 .typing-indicator {
     display: flex;
     align-items: center;
@@ -284,140 +272,50 @@ body.dark-mode {
     justify-content: flex-start;
 }
 
-.typing-dot {
-    width: 6px;
-    height: 6px;
-    background-color: #888;
-    border-radius: 50%;
-    margin: 0 2px;
-    animation: bounce 1.4s infinite ease-in-out both;
-}
-
-.typing-dot:nth-child(1) { animation-delay: -0.32s; }
-.typing-dot:nth-child(2) { animation-delay: -0.16s; }
-.typing-dot:nth-child(3) { animation-delay: 0s; }
-
-@keyframes bounce {
-  0%, 80%, 100% { transform: scale(0); }
-  40% { transform: scale(1.0); }
-}
-
-/* --- Estilos do Painel Lateral (Side Panel) --- */
-
-/* Botão Flutuante */
+/* Estilos para o Painel Lateral e Botões */
 #openPanelButton {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background-color: #0077cc;
-    color: white;
-    border: none;
-    font-size: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    cursor: pointer;
-    z-index: 1000; /* Acima de tudo */
-    transition: transform 0.3s;
+    position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px;
+    border-radius: 50%; background-color: #0077cc; color: white; border: none;
+    font-size: 20px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); cursor: pointer;
+    z-index: 1000; transition: transform 0.3s;
 }
 
-#openPanelButton:hover {
-    transform: scale(1.1);
-}
-
-/* Painel Lateral */
 .side-panel {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 200px;
-    max-width: 80vw; /* Garante que funcione bem em telas pequenas */
-    height: 100%;
-    background-color: #f7f7f7;
-    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.3);
-    z-index: 999;
-    padding: 20px;
-    transform: translateX(100%);
-    transition: transform 0.4s ease-in-out;
+    position: fixed; top: 0; right: 0; width: 200px; max-width: 80vw; 
+    height: 100%; background-color: #f7f7f7; box-shadow: -2px 0 5px rgba(0, 0, 0, 0.3);
+    z-index: 999; padding: 20px; transform: translateX(100%); transition: transform 0.4s ease-in-out;
     overflow-y: auto;
 }
 
-.dark-mode .side-panel {
-    background-color: #333;
-    color: #fff;
-}
-
-/* Estado Aberto */
 .side-panel.open {
     transform: translateX(0);
 }
 
-.side-panel h2 {
-    margin-top: 10px;
-    border-bottom: 1px solid #ccc;
-    padding-bottom: 10px;
-    text-align: center;
-    font-size: 16px; 
-}
-
-.dark-mode .side-panel h2 {
-    border-bottom: 1px solid #555;
-}
-
-.close-btn {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    background: none;
-    border: none;
-    font-size: 30px;
-    cursor: pointer;
-    color: #333;
-}
-.dark-mode .close-btn {
-    color: #ccc;
-}
-
-
-/* Ícones de Contato - MUDANÇA PARA COLUNA */
 .contact-icons {
-    display: flex;
-    flex-direction: column; /* Organiza os itens em coluna */
-    align-items: center; /* Centraliza os ícones */
-    gap: 15px; /* Espaçamento entre os ícones */
-    padding: 30px 10px;
-    margin-bottom: 20px;
+    display: flex; flex-direction: column; align-items: center; gap: 15px; 
+    padding: 30px 10px; margin-bottom: 20px;
 }
-
 .contact-icons a {
-    font-size: 40px; 
-    color: #0077cc;
-    transition: color 0.3s;
+    font-size: 40px; color: #0077cc; transition: color 0.3s;
 }
-
-.contact-icons a:hover {
-    color: #005aa3;
-}
-
 .fab.fa-whatsapp-square {
-    color: #25D366; /* Cor específica do WhatsApp */
+    color: #25D366;
 }
 
-
-/* Botão de CV */
-.download-cv-btn {
-    width: 100%;
-    padding: 12px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 14px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.download-cv-btn:hover {
-    background-color: #45a049;
+/* --- ESTILO CORRIGIDO E FORÇADO PARA O IFRAME (RODAPÉ FIXO) --- */
+#financeWidget {
+    /* Força o posicionamento fixo e inferior */
+    position: fixed !important; 
+    bottom: 0 !important;
+    
+    /* Centraliza o iframe */
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    
+    /* Força a largura e altura do elemento */
+    width: 100% !important; 
+    max-width: 400px !important; 
+    height: 80px !important; 
+    z-index: 100 !important; 
+    margin: 0 !important; /* Remove qualquer margem que possa afetar o posicionamento */
 }
