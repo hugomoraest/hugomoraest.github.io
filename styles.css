@@ -24,7 +24,7 @@ body.dark-mode {
     display: flex;
     flex-direction: column;
     /* Reduz a altura máxima para garantir que o iframe fixo não cubra o input */
-    max-height: calc(90vh - 80px); /* 80px é a altura do iframe */
+    max-height: calc(90vh - 80px); 
     background-color: #fff;
     transition: background-color 1.3s ease, box-shadow 0.3s ease; 
     transition-delay: 0.3s; /* Espera 0.3s antes de mudar */
@@ -51,7 +51,6 @@ body.dark-mode {
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
     position: relative;
-    /* Padding para acomodar os dois botões no topo */
     padding-bottom: 70px; 
 }
 
@@ -78,12 +77,10 @@ body.dark-mode {
     right: 15px;
 }
 
-/* Botão Modo Noturno: Posição SUPERIOR */
 #toggleNightMode {
     top: 15px;
 }
 
-/* Botão Exportar: Posição INFERIOR, alinhado abaixo do Modo Noturno */
 #exportButton {
     top: 50px; 
 }
@@ -92,28 +89,83 @@ body.dark-mode {
     background-color: rgba(255, 255, 255, 0.3);
 }
 
-/* --- ESTILO CORRIGIDO PARA O IFRAME (RODAPÉ FIXO) --- */
-#financeWidget {
-    /* Garante que o iframe flutue sobre o conteúdo e fique no rodapé */
-    position: fixed; 
-    bottom: 0;
-    
-    /* Centraliza o iframe na largura de 100% da sua max-width */
-    left: 50%;
-    transform: translateX(-50%);
-    
-    /* Garante que ele tenha a mesma largura máxima que o chat */
-    max-width: 400px; 
-    width: 100%; 
-    z-index: 100; /* Acima do body, mas abaixo do painel lateral */
+.chat-messages {
+    flex: 1;
+    padding: 20px 15px;
+    overflow-y: auto;
 }
 
+/* --- CORREÇÃO DE ALINHAMENTO LADO A LADO --- */
+.chat-input {
+    /* ATIVA O FLEXBOX */
+    display: flex; 
+    align-items: center; /* Centraliza verticalmente input e botão */
+    padding: 10px;
+    border-top: 1px solid #ddd;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    transition: background-color 1.3s ease; 
+    transition-delay: 0.3s;
+}
 
-/* --- Estilo para o Contador de Custo (Formato Quadrado Otimizado) --- */
+.dark-mode .chat-input {
+    background-color: #333;
+    border-top: 1px solid #444;
+}
+
+#perguntaInput {
+    /* Ocupa o máximo de espaço possível */
+    flex-grow: 1; 
+    height: 40px;
+    padding: 0 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    outline: none;
+    border-radius: 20px;
+    margin-right: 8px; /* Espaço entre o input e o botão */
+    transition: border-color 0.3s, background-color 1.3s ease, color 1.3s ease; 
+    transition-delay: 0.3s;
+}
+
+.dark-mode #perguntaInput {
+    background-color: #444;
+    color: #fff;
+    border-color: #555;
+}
+
+#perguntaInput:focus {
+    border-color: #0077cc;
+}
+
+#sendButton {
+    /* Botão agora é um círculo de tamanho fixo */
+    width: 40px;
+    height: 40px;
+    background-color: #0077cc;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+    /* Reduz o impacto no flex-grow */
+    flex-shrink: 0; 
+}
+
+#sendButton:hover {
+    background-color: #005aa3;
+}
+
+#sendButton:disabled {
+    background-color: #999;
+    cursor: not-allowed;
+}
+/* --- FIM DA CORREÇÃO DE ALINHAMENTO --- */
+
+
+/* --- Estilo para o Contador de Custo (Posicionamento Externo) --- */
 .cost-tracker {
     position: fixed; 
-    
-    /* DEFINIÇÃO DO FORMATO OTIMIZADO */
     width: auto;
     height: auto;
     min-width: 100px; 
@@ -121,9 +173,7 @@ body.dark-mode {
     flex-direction: column; 
     justify-content: center; 
     align-items: center; 
-    
     padding: 10px 15px; 
-    
     background-color: #fff;
     color: #0077cc;
     border-radius: 8px;
@@ -144,7 +194,7 @@ body.dark-mode {
 .cost-text {
     font-size: 11px; 
     line-height: 1.2;
-    margin-bottom: 5px; /* Espaço entre o título e o valor */
+    margin-bottom: 5px; 
 }
 
 #currentCost {
@@ -160,77 +210,8 @@ body.dark-mode {
 /* --- FIM DO NOVO ESTILO --- */
 
 
-.chat-messages {
-    flex: 1;
-    padding: 20px 15px;
-    overflow-y: auto;
-}
-
-.chat-input {
-    padding: 10px;
-    border-top: 1px solid #ddd;
-    border-bottom-left-radius: 8px;
-    border-bottom-right-radius: 8px;
-    transition: background-color 1.3s ease; 
-    transition-delay: 0.3s;
-}
-
-.dark-mode .chat-input {
-    background-color: #333;
-    border-top: 1px solid #444;
-}
-
-#perguntaInput {
-    width: calc(100% - 20px);
-    height: 40px;
-    padding: 0 10px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    outline: none;
-    border-radius: 20px;
-    margin-right: 8px;
-    transition: border-color 0.3s, background-color 1.3s ease, color 1.3s ease; 
-    transition-delay: 0.3s;
-}
-
-.dark-mode #perguntaInput {
-    background-color: #444;
-    color: #fff;
-    border-color: #555;
-}
-
-#perguntaInput:focus {
-    border-color: #0077cc;
-}
-
-#sendButton {
-    width: 40px;
-    height: 40px;
-    background-color: #0077cc;
-    color: #fff;
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s;
-}
-
-#sendButton:hover {
-    background-color: #005aa3;
-}
-
-#sendButton:disabled {
-    background-color: #999;
-    cursor: not-allowed;
-}
-
-/* --- Estilo de Mensagens (Bolhas) --- */
 .chat-message {
     margin-bottom: 12px;
-    display: flex;
-    align-items: flex-end;
-    transition: color 1.3s ease; 
-    transition-delay: 0.3s;
 }
 
 .message-content {
