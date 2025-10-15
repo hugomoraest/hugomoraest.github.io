@@ -4,8 +4,9 @@ body {
     font-family: 'Arial', sans-serif;
     margin: 0;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    /* Alinha os filhos (chat e iframe) em coluna e centraliza horizontalmente */
+    flex-direction: column; 
+    align-items: center; 
     min-height: 100vh;
     background-color: #f7f7f7; /* Cor de fundo "Dia" */
     transition: background-color 1.3s ease, color 1.3s ease; 
@@ -50,6 +51,7 @@ body.dark-mode {
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
     position: relative;
+    /* Aumenta o padding inferior para acomodar os dois botões no topo */
     padding-bottom: 70px; 
 }
 
@@ -81,7 +83,7 @@ body.dark-mode {
     top: 15px;
 }
 
-/* Botão Exportar: Posição INFERIOR, alinhado à direita */
+/* Botão Exportar: Posição INFERIOR, alinhado abaixo do Modo Noturno */
 #exportButton {
     top: 50px; 
 }
@@ -90,27 +92,25 @@ body.dark-mode {
     background-color: rgba(255, 255, 255, 0.3);
 }
 
-/* --- NOVO: Estilo para o Contador de Custo (Formato Quadrado Otimizado) --- */
+/* --- Estilo para o Contador de Custo (Formato Quadrado Otimizado) --- */
 .cost-tracker {
     position: fixed; 
     
-    /* REMOVIDO: Altura e Largura fixas (100px) */
-    width: auto;
+    /* DEFINIÇÃO DO FORMATO QUADRADO E ALINHAMENTO VERTICAL */
+    width: 100px;
     height: auto;
-    min-width: 100px; /* Garante que não fique muito estreito */
-    
+    min-width: 100px;
     display: flex;
-    flex-direction: column; /* Alinha o conteúdo verticalmente */
-    /* Padding e justificação ajustados para o mínimo de espaço */
+    flex-direction: column; 
     justify-content: center; 
     align-items: center; 
     
-    padding: 10px 15px; /* Mais padding nas laterais, menos no topo/fundo */
+    padding: 10px 15px; 
     
     background-color: #fff;
     color: #0077cc;
     border-radius: 8px;
-    font-size: 11px; 
+    font-size: 11px;
     font-weight: bold;
     text-align: center;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -120,7 +120,7 @@ body.dark-mode {
 
 .dark-mode .cost-tracker {
     background-color: #444;
-    color: #FF0000;
+    color: #f7f7f7;
     box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
 }
 
@@ -131,7 +131,7 @@ body.dark-mode {
 }
 
 #currentCost {
-    color: #FF0000; 
+    color: #4CAF50; 
     font-size: 16px; 
     font-weight: 800;
     line-height: 1; /* Garante que a linha de valor seja compacta */
@@ -150,10 +150,8 @@ body.dark-mode {
 }
 
 .chat-input {
-    display: flex;
     padding: 10px;
     border-top: 1px solid #ddd;
-    background-color: #fff;
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
     transition: background-color 1.3s ease; 
@@ -166,7 +164,7 @@ body.dark-mode {
 }
 
 #perguntaInput {
-    flex-grow: 1;
+    width: calc(100% - 20px);
     height: 40px;
     padding: 0 10px;
     font-size: 16px;
@@ -259,169 +257,4 @@ body.dark-mode {
 
 .avatar-icon {
     font-size: 18px;
-    margin-right: 5px;
-    align-self: flex-start;
-}
-
-.pmgpt-message .avatar-icon {
-    color: #0077cc;
-}
-
-.user-message .avatar-icon {
-    color: #4CAF50;
-    order: 2;
-    margin-left: 5px;
-    margin-right: 0;
-}
-
-.user-message .message-content {
-    order: 1;
-}
-
-/* --- Indicador de Digitação (Typing Indicator) --- */
-.typing-indicator {
-    display: flex;
-    align-items: center;
-    padding: 10px 15px;
-    font-size: 14px;
-    color: #888;
-    justify-content: flex-start;
-}
-
-.typing-dot {
-    width: 6px;
-    height: 6px;
-    background-color: #888;
-    border-radius: 50%;
-    margin: 0 2px;
-    animation: bounce 1.4s infinite ease-in-out both;
-}
-
-.typing-dot:nth-child(1) { animation-delay: -0.32s; }
-.typing-dot:nth-child(2) { animation-delay: -0.16s; }
-.typing-dot:nth-child(3) { animation-delay: 0s; }
-
-@keyframes bounce {
-  0%, 80%, 100% { transform: scale(0); }
-  40% { transform: scale(1.0); }
-}
-
-/* --- Estilos do Painel Lateral (Side Panel) --- */
-
-/* Botão Flutuante */
-#openPanelButton {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background-color: #0077cc;
-    color: white;
-    border: none;
-    font-size: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    cursor: pointer;
-    z-index: 1000; /* Acima de tudo */
-    transition: transform 0.3s;
-}
-
-#openPanelButton:hover {
-    transform: scale(1.1);
-}
-
-/* Painel Lateral */
-.side-panel {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 200px;
-    max-width: 80vw; /* Garante que funcione bem em telas pequenas */
-    height: 100%;
-    background-color: #f7f7f7;
-    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.3);
-    z-index: 999;
-    padding: 20px;
-    transform: translateX(100%);
-    transition: transform 0.4s ease-in-out;
-    overflow-y: auto;
-}
-
-.dark-mode .side-panel {
-    background-color: #333;
-    color: #fff;
-}
-
-/* Estado Aberto */
-.side-panel.open {
-    transform: translateX(0);
-}
-
-.side-panel h2 {
-    margin-top: 10px;
-    border-bottom: 1px solid #ccc;
-    padding-bottom: 10px;
-    text-align: center;
-    font-size: 16px; 
-}
-
-.dark-mode .side-panel h2 {
-    border-bottom: 1px solid #555;
-}
-
-.close-btn {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    background: none;
-    border: none;
-    font-size: 30px;
-    cursor: pointer;
-    color: #333;
-}
-.dark-mode .close-btn {
-    color: #ccc;
-}
-
-
-/* Ícones de Contato - MUDANÇA PARA COLUNA */
-.contact-icons {
-    display: flex;
-    flex-direction: column; /* Organiza os itens em coluna */
-    align-items: center; /* Centraliza os ícones */
-    gap: 15px; /* Espaçamento entre os ícones */
-    padding: 30px 10px;
-    margin-bottom: 20px;
-}
-
-.contact-icons a {
-    font-size: 40px; 
-    color: #0077cc;
-    transition: color 0.3s;
-}
-
-.contact-icons a:hover {
-    color: #005aa3;
-}
-
-.fab.fa-whatsapp-square {
-    color: #25D366; /* Cor específica do WhatsApp */
-}
-
-
-/* Botão de CV */
-.download-cv-btn {
-    width: 100%;
-    padding: 12px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 14px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.download-cv-btn:hover {
-    background-color: #45a049;
-}
+    margin-right: 5
